@@ -152,7 +152,7 @@
       transform: translateY(0);
     }
 
-    /* 3D Background Canvas */
+    /* 3D Background Canvas - Softly Placed Behind UI Text */
     #three-bg-canvas {
       position: fixed;
       top: 0;
@@ -161,6 +161,15 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
+      opacity: 0.52;
+      transition: opacity 0.5s ease;
+    }
+
+    /* Fluid Clamp Typography for Hero Title - Scaled Down ~20% */
+    .hero-main-title {
+      font-size: clamp(1.75rem, 3.8vw, 3.15rem) !important;
+      line-height: 1.12 !important;
+      letter-spacing: -0.025em !important;
     }
 
     /* Text Readability Styles - Crisp & Sharp with Zero Neon Glows */
@@ -250,8 +259,8 @@
   ════════════════════════════════════════════════════════ -->
   <canvas id="three-bg-canvas" aria-hidden="true"></canvas>
 
-  <!-- Subtle High-Tech Secondary Grid Lines -->
-  <div id="cyber-grid" class="fixed inset-0 pointer-events-none z-[1] opacity-20 transition-all duration-700"></div>
+  <!-- Subtle High-Tech Secondary Grid Lines (Ultra-Subtle) -->
+  <div id="cyber-grid" class="fixed inset-0 pointer-events-none z-[1] opacity-10 transition-all duration-700"></div>
 
   <!-- Ambient Vignette & Deep Backdrop -->
   <div id="ambient-vignette" class="fixed inset-0 pointer-events-none z-[1] bg-[radial-gradient(circle_at_50%_0%,rgba(var(--primary-rgb),0.06)_0%,transparent_65%)] transition-colors duration-500"></div>
@@ -261,7 +270,7 @@
        FIXED TOP NAVIGATION BAR
   ════════════════════════════════════════════════════════ -->
   <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-panel border-b border-white/[0.08]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 sm:h-18">
         
         <!-- Brand Logo -->
@@ -370,9 +379,9 @@
     ──────────────────────────────────────────────────── -->
     <section id="view-home" class="page-view active-view min-h-screen">
       
-      <!-- HERO SECTION (Refined Scaling ~20-25% Down, Clean Luxury) -->
-      <div class="relative min-h-[85vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 sm:py-16 overflow-hidden">
-        <div class="max-w-4xl mx-auto text-center relative z-10">
+      <!-- HERO SECTION (Spacious, Luxury Dark, 20% Scaled Fluid Clamp Title) -->
+      <div class="relative min-h-[88vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28 overflow-hidden">
+        <div class="max-w-[1100px] mx-auto text-center relative z-10 w-full">
           
           <!-- Secondary Status Tag -->
           <div id="hero-status-badge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-deep-900/90 text-xs font-semibold tracking-wider uppercase mb-6 shadow-md transition-all" style="border: 1px solid var(--secondary); color: var(--secondary);">
@@ -380,8 +389,8 @@
             <span class="text-zinc-200">24/7 Biometric Access • <span class="location-full-text">The #1 Gym in <span class="city-name font-bold text-white">Mesa, AZ</span></span></span>
           </div>
 
-          <!-- Main Hero Headline: Crisp White Prefix + Target Color Gym Highlight (Clean & Crisp, Zero Glows) -->
-          <h1 class="font-heading font-black text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.1] uppercase mb-4">
+          <!-- Main Hero Headline: Scaled down 20% with dynamic fluid clamp typography -->
+          <h1 class="hero-main-title font-heading font-black tracking-tight uppercase mb-4">
             <span class="headline-prefix text-white inline-block">FORGE YOUR<br class="hidden sm:inline"> ULTIMATE</span><br>
             <span class="highlight inline-block font-extrabold italic tracking-tight" id="hero-brand-highlight">
               <span class="brand-title">KRONOS APEX</span>
@@ -394,7 +403,7 @@
           </p>
 
           <!-- Dual Call to Action Buttons: High-Impact Primary + Glassmorphism Secondary Ghost -->
-          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12">
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4">
             <!-- Primary CTA Button (Dynamic Contrast Engine Driven) -->
             <a href="#membership" id="hero-cta-btn" class="main-cta-btn w-full sm:w-auto px-6 py-3 rounded-xl text-xs sm:text-sm font-heading font-bold tracking-wider transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5">
               <span class="cta-text">EXPLORE MEMBERSHIPS</span>
@@ -408,8 +417,8 @@
             </button>
           </div>
 
-          <!-- Live Metrics / Stats Ribbon -->
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-6 border-t border-white/10 max-w-3xl mx-auto">
+          <!-- Live Metrics / Stats Ribbon with Increased Vertical Spacing (gap: 2.5rem = mt-10 pt-10) -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 mt-10 pt-10 border-t border-white/10 max-w-3xl mx-auto">
             <div class="p-3.5 rounded-xl glass-card text-center bg-deep-900/80 border border-white/10 shadow-md">
               <div class="font-heading font-black text-xl sm:text-2xl text-white tracking-tight">
                 18,500 <span class="stat-unit text-base font-bold" style="color: var(--secondary);">SQ FT</span>
@@ -440,7 +449,7 @@
       </div>
 
       <!-- "OUR STORY" SECTION -->
-      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5 relative">
+      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto border-t border-white/5 relative">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
           
           <!-- Story Narrative Content -->
@@ -509,7 +518,7 @@
       </section>
 
       <!-- INTERACTIVE GALLERY SECTION -->
-      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto border-t border-white/5">
         <div class="text-center max-w-3xl mx-auto mb-10">
           <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-2.5">
             <i class="fa-solid fa-camera"></i> Visual Tour
@@ -638,7 +647,7 @@
       </section>
 
       <!-- LIVE INTERACTIVE BMI CALCULATOR SECTION -->
-      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto border-t border-white/5">
         <div class="max-w-4xl mx-auto glass-panel p-5 sm:p-7 rounded-2xl border border-white/10 relative overflow-hidden shadow-2xl">
           
           <div class="text-center max-w-2xl mx-auto mb-8">
@@ -750,7 +759,7 @@
       </section>
 
       <!-- TESTIMONIALS SECTION -->
-      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+      <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto border-t border-white/5">
         <div class="text-center max-w-3xl mx-auto mb-10">
           <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-2">
             <i class="fa-solid fa-trophy"></i> Proven Transformations
@@ -909,7 +918,7 @@
     <!-- ───────────────────────────────────────────────────
          2. MEMBERSHIP VIEW (#membership)
     ──────────────────────────────────────────────────── -->
-    <section id="view-membership" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="view-membership" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto">
       
       <!-- Membership Page Header -->
       <div class="text-center max-w-3xl mx-auto mb-10">
@@ -933,7 +942,7 @@
       </div>
 
       <!-- Pricing Cards Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-7xl mx-auto mb-14">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch max-w-[1100px] mx-auto mb-14">
         
         <!-- PLAN 1: SILVER ACCESS -->
         <div class="p-6 sm:p-7 rounded-2xl glass-card border border-white/10 flex flex-col justify-between relative group">
@@ -1107,7 +1116,7 @@
     <!-- ───────────────────────────────────────────────────
          3. SHOP VIEW (#shop)
     ──────────────────────────────────────────────────── -->
-    <section id="view-shop" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="view-shop" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto">
       
       <!-- Shop Page Header -->
       <div class="text-center max-w-3xl mx-auto mb-10">
@@ -1361,7 +1370,7 @@
     <!-- ───────────────────────────────────────────────────
          4. FACILITIES VIEW (#facilities)
     ──────────────────────────────────────────────────── -->
-    <section id="view-facilities" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="view-facilities" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto">
       
       <!-- Facilities Header -->
       <div class="text-center max-w-3xl mx-auto mb-10">
@@ -1538,7 +1547,7 @@
     <!-- ───────────────────────────────────────────────────
          5. CONTACT US & LOCATION VIEW (#contact)
     ──────────────────────────────────────────────────── -->
-    <section id="view-contact" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="view-contact" class="page-view min-h-screen py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-[1100px] mx-auto">
       
       <!-- Contact Header -->
       <div class="text-center max-w-3xl mx-auto mb-10">
@@ -1553,7 +1562,7 @@
         </p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-6xl mx-auto mb-14">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-[1100px] mx-auto mb-14">
         
         <!-- Left Column: Operating Hours, Location Details, WhatsApp -->
         <div class="lg:col-span-5 space-y-5">
@@ -1697,7 +1706,7 @@
        GLOBAL FOOTER
   ════════════════════════════════════════════════════════ -->
   <footer class="relative z-10 border-t border-white/10 bg-deep-950/90 backdrop-blur-xl pt-16 pb-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/5">
         
         <!-- Brand Summary -->
@@ -2562,20 +2571,20 @@
       // ─────────────────────────────────────────────────────────
       // LIGHTING SETUP (High-End Rim Lighting on Calibrated Steel)
       // ─────────────────────────────────────────────────────────
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.15);
+      const dirLight = new THREE.DirectionalLight(0xffffff, 0.75);
       dirLight.position.set(-15, 25, 20);
       scene.add(dirLight);
 
-      // Primary Accent Rim Point Light
-      const primaryLight = new THREE.PointLight(initialPriColor, 2.2, 55);
+      // Primary Accent Rim Point Light (subtle edge reflection)
+      const primaryLight = new THREE.PointLight(initialPriColor, 1.3, 50);
       primaryLight.position.set(18, 12, 10);
       scene.add(primaryLight);
 
-      // Secondary Accent Point Light
-      const secondaryLight = new THREE.PointLight(initialSecColor, 2.0, 55);
+      // Secondary Accent Point Light (soft mood illumination)
+      const secondaryLight = new THREE.PointLight(initialSecColor, 1.2, 50);
       secondaryLight.position.set(-18, -10, 10);
       scene.add(secondaryLight);
 
@@ -2813,7 +2822,7 @@
         return new THREE.CanvasTexture(bCanvas);
       }
 
-      const bokehCount = 35;
+      const bokehCount = 14;
       const bokehGeom = new THREE.BufferGeometry();
       const bokehPos = new Float32Array(bokehCount * 3);
       const bokehColors = new Float32Array(bokehCount * 3);
@@ -2822,16 +2831,16 @@
         const i3 = i * 3;
         bokehPos[i3] = (Math.random() - 0.5) * 65;
         bokehPos[i3 + 1] = (Math.random() - 0.5) * 45;
-        bokehPos[i3 + 2] = -6 - Math.random() * 30; // Floating deep in z-space
+        bokehPos[i3 + 2] = -8 - Math.random() * 28; // Floating deep in z-space
 
         if (Math.random() > 0.5) {
           bokehColors[i3] = initialSecColor.r;
           bokehColors[i3 + 1] = initialSecColor.g;
           bokehColors[i3 + 2] = initialSecColor.b;
         } else {
-          bokehColors[i3] = 0.6;
-          bokehColors[i3 + 1] = 0.6;
-          bokehColors[i3 + 2] = 0.65;
+          bokehColors[i3] = 0.45;
+          bokehColors[i3 + 1] = 0.45;
+          bokehColors[i3 + 2] = 0.50;
         }
       }
 
@@ -2839,11 +2848,11 @@
       bokehGeom.setAttribute('color', new THREE.BufferAttribute(bokehColors, 3));
 
       const bokehMat = new THREE.PointsMaterial({
-        size: 24.0,
+        size: 20.0,
         map: createBokehTexture(),
         vertexColors: true,
         transparent: true,
-        opacity: 0.22,
+        opacity: 0.12,
         depthWrite: false,
         blending: THREE.AdditiveBlending
       });
@@ -2852,9 +2861,10 @@
       scene.add(bokehSystem);
 
       // ─────────────────────────────────────────────────────────
-      // DYNAMIC 3D MICRO-PARTICLE ENGINE (PHYSICS REPEL & RETURN)
+      // DYNAMIC 3D MICRO-PARTICLE ENGINE (ULTRA-FINE & REPEL PHYSICS)
       // ─────────────────────────────────────────────────────────
-      const particleCount = 700;
+      // Particle count reduced by 50% (from 700 to 350)
+      const particleCount = 350;
       const geomParticles = new THREE.BufferGeometry();
       const origPositions = new Float32Array(particleCount * 3);
       const positions = new Float32Array(particleCount * 3);
@@ -2864,36 +2874,36 @@
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        const ox = (Math.random() - 0.5) * 80;
-        const oy = (Math.random() - 0.5) * 80;
-        const oz = (Math.random() - 0.5) * 45 - 5;
+        const ox = (Math.random() - 0.5) * 85;
+        const oy = (Math.random() - 0.5) * 85;
+        const oz = (Math.random() - 0.5) * 40 - 6;
         origPositions[i3] = positions[i3] = ox;
         origPositions[i3 + 1] = positions[i3 + 1] = oy;
         origPositions[i3 + 2] = positions[i3 + 2] = oz;
 
-        if (Math.random() > 0.4) {
+        if (Math.random() > 0.45) {
           particleType[i] = 1; // Secondary Accent particle
           colors[i3] = initialSecColor.r; 
           colors[i3 + 1] = initialSecColor.g; 
           colors[i3 + 2] = initialSecColor.b;
         } else {
-          particleType[i] = 0; // Silver metallic particle
-          colors[i3] = 0.42; 
-          colors[i3 + 1] = 0.42; 
-          colors[i3 + 2] = 0.48;
+          particleType[i] = 0; // Silver metallic micro-dot
+          colors[i3] = 0.35; 
+          colors[i3 + 1] = 0.35; 
+          colors[i3 + 2] = 0.40;
         }
       }
 
       geomParticles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       geomParticles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-      // Micro-particles: Scaled down to crisp micro-points (1px - 2px max)
+      // Ultra-Fine Particles: micro-dots (0.95px) with reduced opacity (0.38)
       const matParticles = new THREE.PointsMaterial({
-        size: 1.2,
+        size: 0.95,
         sizeAttenuation: true,
         vertexColors: true,
         transparent: true,
-        opacity: 0.65
+        opacity: 0.38
       });
       const particleSystem = new THREE.Points(geomParticles, matParticles);
       scene.add(particleSystem);
@@ -3008,11 +3018,17 @@
         targetX += (mouseX - targetX) * 0.03;
         targetY += (mouseY - targetY) * 0.03;
 
-        // Physics-based Mouse Repel & Drift-Back Effect on Micro-Particles
-        const repelRadius = 8.5;
-        const repelStrength = 0.45;
-        const returnSpeed = 0.04;
-        const damping = 0.88;
+        // ─────────────────────────────────────────────────────────
+        // PHYSICS MOUSE REPULSION (~100px screen radius zone)
+        // Active vector push away from cursor + gentle spring back
+        // ─────────────────────────────────────────────────────────
+        const vFovRad = (camera.fov * Math.PI) / 360;
+        const vHeight = 2 * Math.tan(vFovRad) * camera.position.z;
+        // Exact 100px screen repulsion zone converted to 3D world units at z = 0
+        const repelRadius = Math.max(2.8, (100 / Math.max(window.innerHeight, 500)) * vHeight);
+        const repelStrength = 0.58;
+        const returnSpeed = 0.045;
+        const damping = 0.86;
 
         for (let i = 0; i < particleCount; i++) {
           const i3 = i * 3;
@@ -3021,27 +3037,36 @@
           const ox = origPositions[i3];
           const oy = origPositions[i3 + 1];
 
+          // Gentle ambient floating breathing movement around resting origin
+          const floatX = Math.sin(elapsedTime * 0.4 + i * 0.8) * 0.35;
+          const floatY = Math.cos(elapsedTime * 0.3 + i * 1.2) * 0.35;
+          const targetRestX = ox + floatX;
+          const targetRestY = oy + floatY;
+
           if (isMouseActive) {
             const dx = px - mouseWorldX;
             const dy = py - mouseWorldY;
             const distSq = dx * dx + dy * dy;
-            if (distSq < repelRadius * repelRadius && distSq > 0.01) {
+            const radSq = repelRadius * repelRadius;
+            if (distSq < radSq && distSq > 0.0001) {
               const dist = Math.sqrt(distSq);
-              const force = (1 - dist / repelRadius) * repelStrength;
+              // Smooth quadratic ease-out repulsive force
+              const norm = 1 - (dist / repelRadius);
+              const force = Math.pow(norm, 1.4) * repelStrength;
               velocities[i3] += (dx / dist) * force;
               velocities[i3 + 1] += (dy / dist) * force;
             }
           }
 
-          // Spring force pulling back to original resting coordinate
-          velocities[i3] += (ox - px) * returnSpeed;
-          velocities[i3 + 1] += (oy - py) * returnSpeed;
+          // Spring force gently pulling back to floating origin
+          velocities[i3] += (targetRestX - px) * returnSpeed;
+          velocities[i3 + 1] += (targetRestY - py) * returnSpeed;
 
-          // Friction damping
+          // Physics damping for natural fluid dissipation
           velocities[i3] *= damping;
           velocities[i3 + 1] *= damping;
 
-          // Integrate velocity into positions
+          // Update position vectors
           positions[i3] += velocities[i3];
           positions[i3 + 1] += velocities[i3 + 1];
         }
