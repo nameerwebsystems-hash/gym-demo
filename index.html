@@ -77,7 +77,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <style>
-    /* CSS Custom Properties Initial Defaults */
+    /* CSS Custom Properties Initial Defaults (Dual-Accent 60-30-10) */
     :root {
       --primary: #FF1E27;
       --primary-color: #FF1E27;
@@ -85,6 +85,12 @@
       --glow-color: rgba(255, 30, 39, 0.5);
       --glow: rgba(255, 30, 39, 0.5);
       --primary-rgb: 255, 30, 39;
+
+      --secondary: #FF8C00;
+      --secondary-color: #FF8C00;
+      --particle-color: #FF8C00;
+      --secondary-rgb: 255, 140, 0;
+      --secondary-glow: rgba(255, 140, 0, 0.5);
     }
 
     /* Custom Scrollbar */
@@ -105,23 +111,23 @@
 
     /* Glassmorphism Classes */
     .glass-panel {
-      background: rgba(14, 14, 19, 0.75);
+      background: rgba(14, 14, 19, 0.78);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
     .glass-card {
-      background: rgba(18, 18, 25, 0.65);
+      background: rgba(18, 18, 25, 0.70);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .glass-card:hover {
-      background: rgba(24, 24, 34, 0.85);
-      border-color: rgba(var(--primary-rgb), 0.4);
+      background: rgba(24, 24, 34, 0.88);
+      border-color: rgba(var(--primary-rgb), 0.45);
       transform: translateY(-4px);
-      box-shadow: 0 15px 35px -10px rgba(var(--primary-rgb), 0.25);
+      box-shadow: 0 15px 35px -10px rgba(var(--primary-rgb), 0.3);
     }
     .glass-crimson {
       background: rgba(var(--primary-rgb), 0.08);
@@ -142,16 +148,6 @@
       transform: translateY(0);
     }
 
-    /* Text Glow Effects */
-    .text-glow-crimson {
-      text-shadow: 0 0 25px rgba(var(--primary-rgb), 0.65);
-    }
-
-    /* Custom Range Sliders for BMI */
-    input[type=range] {
-      accent-color: var(--primary);
-    }
-
     /* 3D Background Canvas */
     #three-bg-canvas {
       position: fixed;
@@ -161,6 +157,35 @@
       height: 100%;
       z-index: 0;
       pointer-events: none;
+    }
+
+    /* Text Readability Styles */
+    .headline-prefix {
+      color: #FFFFFF !important;
+      -webkit-text-fill-color: #FFFFFF !important;
+      text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95), 0 2px 5px rgba(0, 0, 0, 0.85) !important;
+    }
+
+    .highlight {
+      color: var(--primary) !important;
+      -webkit-text-fill-color: var(--primary) !important;
+      text-shadow: 0 0 35px var(--glow), 0 0 70px var(--glow), 0 2px 10px rgba(0,0,0,0.85) !important;
+      filter: drop-shadow(0 0 25px var(--glow));
+    }
+
+    /* Secondary Ghost Button */
+    .secondary-ghost-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.22) !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+      color: #ffffff !important;
+    }
+    .secondary-ghost-btn:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 25px rgba(var(--primary-rgb), 0.45) !important;
     }
   </style>
 
@@ -175,6 +200,9 @@
   ════════════════════════════════════════════════════════ -->
   <canvas id="three-bg-canvas" aria-hidden="true"></canvas>
 
+  <!-- Subtle High-Tech Secondary Grid Lines (60-30-10 Secondary Accent) -->
+  <div id="cyber-grid" class="fixed inset-0 pointer-events-none z-[1] opacity-25 transition-all duration-700"></div>
+
   <!-- Ambient Vignette & Dynamic Atmospheric Glows -->
   <div id="ambient-vignette" class="fixed inset-0 pointer-events-none z-[1] bg-[radial-gradient(circle_at_50%_0%,rgba(220,38,38,0.18)_0%,transparent_60%)] transition-colors duration-500"></div>
   <div class="fixed bottom-0 left-0 right-0 h-96 pointer-events-none z-[1] bg-gradient-to-t from-deep-950 via-deep-950/60 to-transparent"></div>
@@ -188,7 +216,7 @@
         
         <!-- Brand Logo -->
         <a href="#home" class="flex items-center gap-3.5 group cursor-pointer focus:outline-none">
-          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center shadow-crimson-sm border border-crimson-500/40 group-hover:shadow-crimson-md group-hover:scale-105 transition-all duration-300">
+          <div id="nav-logo-box" class="w-11 h-11 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center shadow-crimson-sm border border-crimson-500/40 group-hover:shadow-crimson-md group-hover:scale-105 transition-all duration-300">
             <i class="fa-solid fa-dumbbell text-white text-xl transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
           </div>
           <div class="flex flex-col">
@@ -232,9 +260,9 @@
             <i class="fa-brands fa-whatsapp text-lg"></i>
           </a>
 
-          <!-- VIP Membership Modal Button -->
-          <button onclick="openMembershipModal('VIP Apex Pass')" class="relative group overflow-hidden px-5 py-2.5 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white font-heading font-semibold text-sm tracking-wider shadow-crimson-sm hover:shadow-crimson-md transition-all duration-300 focus:outline-none flex items-center gap-2">
-            <span class="relative z-10">JOIN NOW</span>
+          <!-- VIP Membership Modal Button (10% Primary Accent) -->
+          <button onclick="openMembershipModal('VIP Apex Pass')" class="main-cta-btn relative group overflow-hidden px-5 py-2.5 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white font-heading font-semibold text-sm tracking-wider shadow-crimson-sm hover:shadow-crimson-md transition-all duration-300 focus:outline-none flex items-center gap-2">
+            <span class="relative z-10 font-bold">JOIN NOW</span>
             <i class="fa-solid fa-bolt text-xs text-amber-300 animate-pulse relative z-10"></i>
             <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
           </button>
@@ -273,7 +301,7 @@
         <i class="fa-solid fa-location-dot w-5 text-crimson-500"></i> Contact & Hours
       </a>
       <div class="pt-3 border-t border-white/10 flex flex-col gap-2">
-        <button onclick="closeMobileMenu(); openMembershipModal('Mobile VIP Pass');" class="w-full py-3 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 text-white font-heading font-bold text-center tracking-wider shadow-crimson-sm">
+        <button onclick="closeMobileMenu(); openMembershipModal('Mobile VIP Pass');" class="main-cta-btn w-full py-3 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 text-white font-heading font-bold text-center tracking-wider shadow-crimson-sm">
           CLAIM 3-DAY VIP PASS
         </button>
         <a id="mobile-whatsapp-link" href="https://wa.me/14805550198" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 font-medium text-sm text-center flex items-center justify-center gap-2">
@@ -297,19 +325,16 @@
       <div class="relative min-h-[92vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 overflow-hidden">
         <div class="max-w-5xl mx-auto text-center relative z-10">
           
-          <!-- Dynamic Status Tag with Location Parameter -->
-          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-crimson-950/70 border border-crimson-600/40 text-crimson-400 text-xs sm:text-sm font-semibold tracking-wider uppercase mb-8 shadow-inner-crimson">
-            <span class="w-2 h-2 rounded-full bg-crimson-500 animate-ping"></span>
-            <span>24/7 Biometric Access • <span class="location-full-text">The #1 Gym in <span class="city-name font-bold">Mesa, AZ</span></span></span>
+          <!-- Secondary Status Tag (30% Secondary Color Accent) -->
+          <div id="hero-status-badge" class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-deep-900/90 text-xs sm:text-sm font-semibold tracking-wider uppercase mb-8 shadow-lg transition-all" style="border: 1px solid var(--secondary); color: var(--secondary);">
+            <span class="w-2 h-2 rounded-full animate-ping" style="background-color: var(--secondary);"></span>
+            <span class="text-zinc-200">24/7 Biometric Access • <span class="location-full-text">The #1 Gym in <span class="city-name font-bold text-white">Mesa, AZ</span></span></span>
           </div>
 
-          <!-- Main Hero Headline with Dynamic Highlight Spans -->
-          <h1 class="font-heading font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.05] text-white uppercase mb-6">
-            FORGE YOUR <br>
-            <span class="bg-gradient-to-r from-white via-zinc-200 to-crimson-500 bg-clip-text text-transparent">
-              ULTIMATE
-            </span>
-            <span class="text-crimson-600 text-glow-crimson italic highlight highlight-accent">
+          <!-- Main Hero Headline: Crisp White Prefix + Luminous Target Color Gym Highlight -->
+          <h1 class="font-heading font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.08] uppercase mb-6">
+            <span class="headline-prefix text-white inline-block">FORGE YOUR<br class="hidden sm:inline"> ULTIMATE</span><br>
+            <span class="highlight inline-block font-extrabold italic tracking-tight" id="hero-brand-highlight">
               <span class="brand-title">KRONOS APEX</span>
             </span>
           </h1>
@@ -319,35 +344,46 @@
             A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.
           </p>
 
-          <!-- Call to Action Buttons Driven by ?cta Parameter -->
+          <!-- Dual Call to Action Buttons: High-Impact Primary + Glassmorphism Secondary Ghost -->
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 mb-16">
+            <!-- Primary CTA Button (10% Primary Color Accent) -->
             <a href="#membership" id="hero-cta-btn" class="main-cta-btn w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-crimson-600 via-crimson-700 to-crimson-800 hover:from-crimson-500 hover:to-crimson-700 text-white font-heading font-bold text-base tracking-wider shadow-crimson-md hover:shadow-crimson-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
               <span class="cta-text">EXPLORE MEMBERSHIPS</span>
               <i class="fa-solid fa-arrow-right text-sm"></i>
             </a>
-            <button onclick="openMembershipModal('3-Day Free Trial')" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel hover:bg-white/10 text-white font-heading font-semibold text-base tracking-wider border border-white/20 hover:border-crimson-500/50 transition-all duration-300 flex items-center justify-center gap-2">
-              <i class="fa-solid fa-ticket text-crimson-500"></i>
-              <span>CLAIM 3-DAY PASS</span>
+
+            <!-- Secondary Ghost Button (Glassmorphism with High-Contrast White/Accent Border) -->
+            <button onclick="openMembershipModal('3-Day Free Trial')" class="secondary-ghost-btn w-full sm:w-auto px-8 py-4 rounded-xl text-white font-heading font-semibold text-base tracking-wider transition-all duration-300 flex items-center justify-center gap-2.5 transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-ticket text-sm" style="color: var(--secondary);"></i>
+              <span class="text-white font-bold tracking-wide">CLAIM 3-DAY PASS</span>
             </button>
           </div>
 
-          <!-- Live Metrics / Stats Ribbon -->
+          <!-- Live Metrics / Stats Ribbon: Pure White Numerical Text with Dynamic Secondary Unit Accents -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-8 border-t border-white/10 max-w-4xl mx-auto">
-            <div class="p-4 rounded-2xl glass-card text-center">
-              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">18,500 <span class="text-crimson-500 text-xl">SQ FT</span></div>
-              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Multi-Level Arena</p>
+            <div class="p-4 rounded-2xl glass-card text-center bg-deep-900/80 border border-white/10 shadow-lg">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">
+                18,500 <span class="stat-unit text-lg font-bold" style="color: var(--secondary);">SQ FT</span>
+              </div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1 font-medium">Multi-Level Arena</p>
             </div>
-            <div class="p-4 rounded-2xl glass-card text-center">
-              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">150 <span class="text-crimson-500 text-xl">LBS</span></div>
-              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Max Dumbbells</p>
+            <div class="p-4 rounded-2xl glass-card text-center bg-deep-900/80 border border-white/10 shadow-lg">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">
+                150 <span class="stat-unit text-lg font-bold" style="color: var(--secondary);">LBS</span>
+              </div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1 font-medium">Max Dumbbells</p>
             </div>
-            <div class="p-4 rounded-2xl glass-card text-center">
-              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">4.95 <span class="text-amber-400 text-lg">★</span></div>
-              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">850+ Elite Members</p>
+            <div class="p-4 rounded-2xl glass-card text-center bg-deep-900/80 border border-white/10 shadow-lg">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">
+                4.95 <span class="stat-unit text-amber-400 text-lg font-bold">★</span>
+              </div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1 font-medium">850+ Elite Members</p>
             </div>
-            <div class="p-4 rounded-2xl glass-card text-center">
-              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">24/7 <span class="text-crimson-500 text-xl">KEY</span></div>
-              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Biometric Entry</p>
+            <div class="p-4 rounded-2xl glass-card text-center bg-deep-900/80 border border-white/10 shadow-lg">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">
+                24/7 <span class="stat-unit text-lg font-bold" style="color: var(--secondary);">KEY</span>
+              </div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1 font-medium">Biometric Entry</p>
             </div>
           </div>
 
@@ -1814,38 +1850,66 @@
        FLOATING URL PARAMETER QUICK TESTER (DEMO CONTROL)
   ════════════════════════════════════════════════════════ -->
   <div id="param-tester" class="fixed bottom-6 left-6 z-40">
-    <div id="param-tester-card" class="hidden mb-3 p-4 rounded-2xl glass-panel border border-white/15 w-80 shadow-2xl space-y-3">
+    <div id="param-tester-card" class="hidden mb-3 p-4 rounded-2xl glass-panel border border-white/15 w-84 shadow-2xl space-y-3">
       <div class="flex items-center justify-between pb-2 border-b border-white/10">
         <span class="text-xs font-heading font-bold text-white flex items-center gap-1.5 uppercase tracking-wider">
-          <i class="fa-solid fa-sliders text-crimson-500"></i> URL Query Presets
+          <i class="fa-solid fa-palette text-crimson-500"></i> 60-30-10 Color Presets
         </span>
         <button onclick="toggleParamTester()" class="text-zinc-400 hover:text-white text-xs">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <p class="text-[11px] text-zinc-400 leading-snug">Click any preset to instantly update the URL parameters, 3D particle engine, and DOM text live:</p>
+      <p class="text-[11px] text-zinc-400 leading-snug">Test dynamic dual-contrast visual mapping (Main Color + Secondary Particle Color):</p>
       <div class="grid grid-cols-1 gap-2">
-        <button onclick="applyPreset('Titan Fitness', '2563eb', '38bdf8', 'Miami, FL', 'START 7-DAY PASS', 'The premier powerlifting and contrast recovery destination in South Florida.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-blue-500/40 text-left flex items-center justify-between transition-colors">
-          <span class="text-xs font-bold text-white">⚡ Titan Fitness (Blue)</span>
-          <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+        <!-- Preset 1: Default Red + Orange -->
+        <button onclick="applyPreset('Kronos Apex', 'FF1E27', 'FF8C00', 'Mesa, AZ', 'EXPLORE MEMBERSHIPS', 'A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-red-500/40 text-left flex items-center justify-between transition-colors">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-white">⚡ Crimson Forge (Default)</span>
+            <span class="text-[10px] text-zinc-400">Red #FF1E27 • Orange #FF8C00</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#FF1E27]"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#FF8C00]"></span>
+          </div>
         </button>
-        <button onclick="applyPreset('Cyber Forge', '00f5d4', '00f5d4', 'Austin, TX', 'JOIN THE MATRIX', 'Biometric performance engineering meets neon recovery chambers.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-teal-500/40 text-left flex items-center justify-between transition-colors">
-          <span class="text-xs font-bold text-white">⚡ Cyber Forge (Cyan)</span>
-          <span class="w-3 h-3 rounded-full bg-teal-400"></span>
+        <!-- Preset 2: Titan Blue + Neon Cyan -->
+        <button onclick="applyPreset('Titan Fitness', '2563EB', '00F5D4', 'Miami, FL', 'START 7-DAY PASS', 'The premier powerlifting and contrast recovery destination in South Florida.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-blue-500/40 text-left flex items-center justify-between transition-colors">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-white">⚡ Titan Blue + Cyan</span>
+            <span class="text-[10px] text-zinc-400">Royal Blue • Neon Cyan</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#2563EB]"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#00F5D4]"></span>
+          </div>
         </button>
-        <button onclick="applyPreset('Valkyrie Apex', 'f59e0b', 'fbbf24', 'New York, NY', 'CLAIM VIP PASS', 'Luxury Manhattan strength sanctuary with calibrated Olympic platforms.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-amber-500/40 text-left flex items-center justify-between transition-colors">
-          <span class="text-xs font-bold text-white">⚡ Valkyrie Apex (Gold)</span>
-          <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+        <!-- Preset 3: Cyber Forge Neon Cyan + Electric Violet -->
+        <button onclick="applyPreset('Cyber Forge', '00F5D4', '8B5CF6', 'Austin, TX', 'JOIN THE MATRIX', 'Biometric performance engineering meets neon recovery chambers.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-teal-500/40 text-left flex items-center justify-between transition-colors">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-white">⚡ Cyber Cyan + Violet</span>
+            <span class="text-[10px] text-zinc-400">Neon Cyan • Electric Violet</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#00F5D4]"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#8B5CF6]"></span>
+          </div>
         </button>
-        <button onclick="applyPreset('Kronos Apex', 'dc2626', 'dc2626', 'Mesa, AZ', 'EXPLORE MEMBERSHIPS', 'A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-red-500/40 text-left flex items-center justify-between transition-colors">
-          <span class="text-xs font-bold text-white">⚡ Kronos Default (Red)</span>
-          <span class="w-3 h-3 rounded-full bg-red-600"></span>
+        <!-- Preset 4: Valkyrie Gold + Crimson Flame -->
+        <button onclick="applyPreset('Valkyrie Apex', 'F59E0B', 'EF4444', 'New York, NY', 'CLAIM VIP PASS', 'Luxury Manhattan strength sanctuary with calibrated Olympic platforms.')" class="px-3 py-2 rounded-xl bg-deep-850 hover:bg-white/10 border border-amber-500/40 text-left flex items-center justify-between transition-colors">
+          <div class="flex flex-col">
+            <span class="text-xs font-bold text-white">⚡ Valkyrie Gold + Flame</span>
+            <span class="text-[10px] text-zinc-400">Gold • Crimson Flame</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-3.5 h-3.5 rounded-full bg-[#F59E0B]"></span>
+            <span class="w-3.5 h-3.5 rounded-full bg-[#EF4444]"></span>
+          </div>
         </button>
       </div>
     </div>
     <button onclick="toggleParamTester()" class="px-3.5 py-2 rounded-full glass-panel hover:bg-white/10 border border-white/20 text-xs font-heading font-bold text-zinc-200 flex items-center gap-2 shadow-lg transition-all">
-      <i class="fa-solid fa-wand-magic-sparkles text-crimson-500"></i>
-      <span>Test URL Params</span>
+      <i class="fa-solid fa-palette text-crimson-500"></i>
+      <span>Test Dual Colors</span>
     </button>
   </div>
 
@@ -1860,7 +1924,7 @@
 
     // Global particle engine hook
     window.particleEngine = {
-      currentColor: '#FF1E27',
+      currentColor: '#FF8C00',
       setParticleColor: function(hex) {
         this.currentColor = hex;
       }
@@ -1881,6 +1945,75 @@
         g: (num >> 8) & 255,
         b: num & 255
       };
+    }
+
+    /* Helper: HSL to Hex */
+    function hslToHex(h, s, l) {
+      let c = (1 - Math.abs(2 * l - 1)) * s;
+      let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      let m = l - c / 2;
+      let r = 0, g = 0, b = 0;
+
+      if (0 <= h && h < 60) { r = c; g = x; b = 0; }
+      else if (60 <= h && h < 120) { r = x; g = c; b = 0; }
+      else if (120 <= h && h < 180) { r = 0; g = c; b = x; }
+      else if (180 <= h && h < 240) { r = 0; g = x; b = c; }
+      else if (240 <= h && h < 300) { r = x; g = 0; b = c; }
+      else if (300 <= h && h < 360) { r = c; g = 0; b = x; }
+
+      let rHex = Math.round((r + m) * 255).toString(16).padStart(2, '0');
+      let gHex = Math.round((g + m) * 255).toString(16).padStart(2, '0');
+      let bHex = Math.round((b + m) * 255).toString(16).padStart(2, '0');
+
+      return `#${rHex}${gHex}${bHex}`.toUpperCase();
+    }
+
+    /* Helper: Derive Complementary / Analogous Secondary Color Automatically */
+    function getComplementarySecondaryColor(hexColor) {
+      const clean = (hexColor || '').replace('#', '').toLowerCase();
+
+      // Curated dual-color contrast pairings for top fitness aesthetics
+      const curated = {
+        'ff1e27': '#FF8C00', // Red -> Solar Amber/Orange
+        'dc2626': '#FF8C00', // Red 600 -> Amber/Orange
+        'ef4444': '#FBBF24', // Crimson -> Gold
+        '2563eb': '#00F5D4', // Royal Blue -> Neon Cyan
+        '3b82f6': '#06B6D4', // Blue -> Cyan
+        '00f5d4': '#8B5CF6', // Neon Cyan -> Electric Violet
+        '10b981': '#A3E635', // Emerald -> Bright Lime
+        '059669': '#F59E0B', // Dark Emerald -> Amber
+        'f59e0b': '#EF4444', // Amber/Gold -> Crimson Flame
+        'd97706': '#DC2626', // Warm Gold -> Blood Red
+        '8b5cf6': '#EC4899', // Purple -> Electric Hot Pink
+        'ec4899': '#8B5CF6'  // Pink -> Violet
+      };
+
+      if (curated[clean]) return curated[clean];
+
+      // Algorithmic Harmony: convert to HSL and apply a +38° hue shift
+      const rgb = hexToRgb(hexColor);
+      if (!rgb) return '#FF8C00';
+
+      let r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255;
+      let max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0, s = 0, l = (max + min) / 2;
+
+      if (max !== min) {
+        let d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
+      }
+
+      let shiftedH = ((h * 360) + 38) % 360;
+      let shiftedS = Math.min(Math.max(s, 0.90), 1.0);
+      let shiftedL = Math.min(Math.max(l, 0.52), 0.65);
+
+      return hslToHex(shiftedH, shiftedS, shiftedL);
     }
 
     /* ─────────────────────────────────────────────────────────────
@@ -1912,9 +2045,11 @@
         el.innerText = cleanName;
       });
 
-      document.querySelectorAll('h1 span.highlight, h1 span.highlight-accent').forEach(el => {
-        el.innerText = cleanName;
-      });
+      // Update ONLY the gym highlight element (prefix "FORGE YOUR ULTIMATE" stays pure crisp white!)
+      const heroHighlight = document.getElementById('hero-brand-highlight');
+      if (heroHighlight) {
+        heroHighlight.innerHTML = `<span class="brand-title">${cleanName}</span>`;
+      }
 
       document.querySelectorAll('.brand-title-split').forEach(el => {
         if (restWords) {
@@ -1927,20 +2062,37 @@
       // 2. Primary Theme Color (color)
       const color = params.get('color');
       const hexColor = color 
-        ? (color.startsWith('#') ? color : `#${color}`) 
-        : "#FF1E27"; // Default Red
+        ? (color.startsWith('#') ? color : `#${color}`).toUpperCase() 
+        : "#FF1E27"; // Default Red #FF1E27
 
       const rgb = hexToRgb(hexColor) || { r: 255, g: 30, b: 39 };
 
-      // Set CSS Variables on :root dynamically at runtime
+      // 3. Secondary / Particle Color (pcolor / particleColor or derived complementary)
+      const pcolorParam = params.get('particleColor') || params.get('pcolor');
+      let hexPColor;
+      if (pcolorParam) {
+        hexPColor = (pcolorParam.startsWith('#') ? pcolorParam : `#${pcolorParam}`).toUpperCase();
+      } else {
+        // Derive harmonious complementary secondary accent automatically
+        hexPColor = getComplementarySecondaryColor(hexColor);
+      }
+
+      const secRgb = hexToRgb(hexPColor) || { r: 255, g: 140, b: 0 };
+
+      // Set CSS Variables on :root (60-30-10 Rule Mapping)
       document.documentElement.style.setProperty('--primary', hexColor);
       document.documentElement.style.setProperty('--primary-color', hexColor);
-      document.documentElement.style.setProperty('--accent-color', hexColor);
+      document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
       document.documentElement.style.setProperty('--glow', hexColor + '80');
       document.documentElement.style.setProperty('--glow-color', hexColor + '80');
-      document.documentElement.style.setProperty('--primary-rgb', `${rgb.r}, ${rgb.g}, ${rgb.b}`);
 
-      // Inject / update dynamic style overrides for instant re-skinning
+      document.documentElement.style.setProperty('--secondary', hexPColor);
+      document.documentElement.style.setProperty('--secondary-color', hexPColor);
+      document.documentElement.style.setProperty('--particle-color', hexPColor);
+      document.documentElement.style.setProperty('--secondary-rgb', `${secRgb.r}, ${secRgb.g}, ${secRgb.b}`);
+      document.documentElement.style.setProperty('--secondary-glow', hexPColor + '80');
+
+      // Inject / update dynamic style overrides for high-contrast dual-color hierarchy
       let styleOverride = document.getElementById('dynamic-theme-override');
       if (!styleOverride) {
         styleOverride = document.createElement('style');
@@ -1955,17 +2107,88 @@
           --glow: ${hexColor}80;
           --glow-color: ${hexColor}80;
           --primary-rgb: ${rgb.r}, ${rgb.g}, ${rgb.b};
+
+          --secondary: ${hexPColor};
+          --secondary-color: ${hexPColor};
+          --particle-color: ${hexPColor};
+          --secondary-rgb: ${secRgb.r}, ${secRgb.g}, ${secRgb.b};
+          --secondary-glow: ${hexPColor}80;
         }
+
+        /* 1. Headline Crisp White Text and Highlight Span */
+        .headline-prefix {
+          color: #FFFFFF !important;
+          -webkit-text-fill-color: #FFFFFF !important;
+          text-shadow: 0 4px 25px rgba(0, 0, 0, 0.95), 0 2px 5px rgba(0, 0, 0, 0.85) !important;
+        }
+
+        .highlight, #hero-brand-highlight {
+          color: var(--primary) !important;
+          -webkit-text-fill-color: var(--primary) !important;
+          text-shadow: 0 0 35px var(--glow), 0 0 70px var(--glow), 0 2px 10px rgba(0,0,0,0.85) !important;
+          filter: drop-shadow(0 0 25px var(--glow)) !important;
+        }
+
+        /* 2. Primary 10% Accents (Buttons, Active Nav, Gym Highlight) */
+        #hero-cta-btn, .main-cta-btn {
+          background: linear-gradient(135deg, var(--primary), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.85)) !important;
+          box-shadow: 0 0 25px -4px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6) !important;
+          border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        }
+        #hero-cta-btn:hover, .main-cta-btn:hover {
+          box-shadow: 0 0 35px -2px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.85) !important;
+        }
+
+        .nav-link.bg-crimson-600 {
+          background-color: var(--primary) !important;
+          box-shadow: 0 0 15px -3px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5) !important;
+        }
+
+        /* 3. Secondary 30% Accents (Particles, Grid, Badges, Stat Units) */
+        #hero-status-badge {
+          border: 1px solid var(--secondary) !important;
+          box-shadow: 0 0 20px -5px rgba(${secRgb.r}, ${secRgb.g}, ${secRgb.b}, 0.4) !important;
+        }
+
+        .stat-unit {
+          color: var(--secondary) !important;
+        }
+
+        #cyber-grid {
+          background-size: 55px 55px;
+          background-image: 
+            linear-gradient(to right, rgba(${secRgb.r}, ${secRgb.g}, ${secRgb.b}, 0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(${secRgb.r}, ${secRgb.g}, ${secRgb.b}, 0.12) 1px, transparent 1px);
+          mask-image: radial-gradient(circle at 50% 35%, black 40%, transparent 85%);
+          -webkit-mask-image: radial-gradient(circle at 50% 35%, black 40%, transparent 85%);
+        }
+
+        /* 4. Secondary Ghost Button */
+        .secondary-ghost-btn {
+          background: rgba(255, 255, 255, 0.05) !important;
+          backdrop-filter: blur(14px) !important;
+          -webkit-backdrop-filter: blur(14px) !important;
+          border: 1px solid rgba(255, 255, 255, 0.22) !important;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+          color: #ffffff !important;
+        }
+        .secondary-ghost-btn:hover {
+          background: rgba(255, 255, 255, 0.12) !important;
+          border-color: var(--primary) !important;
+          box-shadow: 0 0 25px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45) !important;
+        }
+
+        /* General Theme Accents */
         .text-crimson-400, .text-crimson-500, .text-crimson-600, .brand-accent-span {
-          color: ${hexColor} !important;
+          color: var(--primary) !important;
         }
         .bg-crimson-600, .bg-crimson-700, .bg-crimson-800,
         .gallery-filter-btn.active, .shop-filter-btn.active, .gender-btn.active,
         #billing-monthly-btn.bg-crimson-600, #billing-annual-btn.bg-crimson-600 {
-          background-color: ${hexColor} !important;
+          background-color: var(--primary) !important;
         }
         .border-crimson-500, .border-crimson-600 {
-          border-color: ${hexColor} !important;
+          border-color: var(--primary) !important;
         }
         .shadow-crimson-sm {
           box-shadow: 0 0 15px -3px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.4) !important;
@@ -1979,27 +2202,18 @@
         .text-glow-crimson {
           text-shadow: 0 0 25px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8) !important;
         }
-        .bg-gradient-to-r.from-crimson-600,
-        .bg-gradient-to-br.from-crimson-600 {
-          background-image: linear-gradient(135deg, ${hexColor}, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.85)) !important;
-        }
         input[type=range] {
-          accent-color: ${hexColor} !important;
+          accent-color: var(--primary) !important;
         }
         ::selection {
-          background-color: ${hexColor} !important;
+          background-color: var(--primary) !important;
           color: #ffffff !important;
         }
       `;
 
-      // 3. Particle Engine Dot Colors (particleColor or pcolor or color fallback)
-      const pcolor = params.get('particleColor') || params.get('pcolor') || color;
-      const hexPColor = pcolor 
-        ? (pcolor.startsWith('#') ? pcolor : `#${pcolor}`) 
-        : hexColor;
-
+      // 3. Particle Engine Dot Colors (Pass Derived or Explicit Secondary Color & Primary Accent)
       if (window.particleEngine && typeof window.particleEngine.setParticleColor === 'function') {
-        window.particleEngine.setParticleColor(hexPColor);
+        window.particleEngine.setParticleColor(hexPColor, hexColor);
       }
 
       // Update Ambient Radial Vignette
@@ -2027,7 +2241,7 @@
         el.innerText = cleanLocation;
       });
       document.querySelectorAll('.location-full-text').forEach(el => {
-        el.innerHTML = `The #1 Gym in <span class="city-name font-bold">${cleanLocation}</span>`;
+        el.innerHTML = `The #1 Gym in <span class="city-name font-bold text-white">${cleanLocation}</span>`;
       });
 
       // 6. Call To Action (cta)
@@ -2103,37 +2317,312 @@
       if (!canvas || typeof THREE === 'undefined') return;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.z = 30;
+      const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 28;
 
       const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // 1. Floating Wireframe Icosahedron & Torus
-      const initialColor = new THREE.Color(window.particleEngine.currentColor || 0xdc2626);
-      
-      const geomIcosa = new THREE.IcosahedronGeometry(9, 1);
-      const matWireIcosa = new THREE.MeshBasicMaterial({
-        color: initialColor,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.18
-      });
-      const meshIcosa = new THREE.Mesh(geomIcosa, matWireIcosa);
-      scene.add(meshIcosa);
+      // Initial Theme Colors
+      const initialSecColor = new THREE.Color(window.particleEngine.currentColor || 0xff8c00);
+      const initialPriColor = new THREE.Color(0xff1e27);
 
-      const geomTorus = new THREE.TorusGeometry(14, 0.4, 16, 100);
-      const matTorus = new THREE.MeshBasicMaterial({
-        color: initialColor,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.12
-      });
-      const meshTorus = new THREE.Mesh(geomTorus, matTorus);
-      scene.add(meshTorus);
+      // ─────────────────────────────────────────────────────────
+      // LIGHTING SETUP (High-End Rim Lighting on Calibrated Steel)
+      // ─────────────────────────────────────────────────────────
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambientLight);
 
-      // 2. Dynamic 3D Particle Galaxy
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1.15);
+      dirLight.position.set(-15, 25, 20);
+      scene.add(dirLight);
+
+      // Primary Accent Rim Point Light
+      const primaryLight = new THREE.PointLight(initialPriColor, 2.2, 55);
+      primaryLight.position.set(18, 12, 10);
+      scene.add(primaryLight);
+
+      // Secondary Accent Point Light
+      const secondaryLight = new THREE.PointLight(initialSecColor, 2.0, 55);
+      secondaryLight.position.set(-18, -10, 10);
+      scene.add(secondaryLight);
+
+      // ─────────────────────────────────────────────────────────
+      // PROCEDURAL 3D GYM MODELS (SUBTLE & DEPTH FOCUSED)
+      // ─────────────────────────────────────────────────────────
+
+      // 1. Medium-Sized Floating Dumbbell (Scaled down ~38%, subtle rotation)
+      function createDumbbellModel(secColor) {
+        const group = new THREE.Group();
+
+        const steelMat = new THREE.MeshStandardMaterial({
+          color: 0x1b1c22,
+          metalness: 0.88,
+          roughness: 0.32
+        });
+
+        const handleMat = new THREE.MeshStandardMaterial({
+          color: 0x828896,
+          metalness: 0.95,
+          roughness: 0.22
+        });
+
+        const accentMat = new THREE.MeshBasicMaterial({
+          color: secColor,
+          transparent: true,
+          opacity: 0.85
+        });
+
+        // Handle shaft
+        const shaftGeom = new THREE.CylinderGeometry(0.24, 0.24, 5.8, 20);
+        const shaft = new THREE.Mesh(shaftGeom, handleMat);
+        group.add(shaft);
+
+        // Knurled grip bands
+        const gripGeom = new THREE.CylinderGeometry(0.27, 0.27, 1.8, 20);
+        const gripTop = new THREE.Mesh(gripGeom, steelMat);
+        gripTop.position.y = 1.2;
+        const gripBottom = new THREE.Mesh(gripGeom, steelMat);
+        gripBottom.position.y = -1.2;
+        group.add(gripTop, gripBottom);
+
+        // Stopper collars
+        const collarGeom = new THREE.CylinderGeometry(0.55, 0.55, 0.3, 20);
+        const collarTop = new THREE.Mesh(collarGeom, steelMat);
+        collarTop.position.y = 2.65;
+        const collarBottom = new THREE.Mesh(collarGeom, steelMat);
+        collarBottom.position.y = -2.65;
+        group.add(collarTop, collarBottom);
+
+        // Hex weight heads
+        [-1, 1].forEach(side => {
+          const hexGeom = new THREE.CylinderGeometry(1.65, 1.65, 1.35, 6);
+          const hex = new THREE.Mesh(hexGeom, steelMat);
+          hex.position.y = side * 3.55;
+          group.add(hex);
+
+          const bevelGeom = new THREE.CylinderGeometry(1.35, 1.65, 0.35, 6);
+          const bevel = new THREE.Mesh(bevelGeom, steelMat);
+          bevel.position.y = side * 2.8;
+          bevel.rotation.x = side === 1 ? 0 : Math.PI;
+          group.add(bevel);
+
+          const ringGeom = new THREE.TorusGeometry(1.68, 0.05, 8, 6);
+          const ring = new THREE.Mesh(ringGeom, accentMat);
+          ring.position.y = side * 3.55;
+          ring.rotation.x = Math.PI / 2;
+          group.add(ring);
+
+          const capGeom = new THREE.CylinderGeometry(1.2, 1.2, 0.12, 16);
+          const cap = new THREE.Mesh(capGeom, handleMat);
+          cap.position.y = side * 4.25;
+          group.add(cap);
+        });
+
+        group.accentMat = accentMat;
+        return group;
+      }
+
+      // 2. Kettlebell (Floating subtly on the left side)
+      function createKettlebellModel(secColor) {
+        const group = new THREE.Group();
+
+        const ironMat = new THREE.MeshStandardMaterial({
+          color: 0x16171c,
+          metalness: 0.82,
+          roughness: 0.38
+        });
+
+        const handleMat = new THREE.MeshStandardMaterial({
+          color: 0x717684,
+          metalness: 0.92,
+          roughness: 0.28
+        });
+
+        const accentMat = new THREE.MeshBasicMaterial({
+          color: secColor,
+          transparent: true,
+          opacity: 0.9
+        });
+
+        // Spherical bell
+        const bellGeom = new THREE.SphereGeometry(2.1, 28, 22);
+        const bell = new THREE.Mesh(bellGeom, ironMat);
+        group.add(bell);
+
+        // Flat base
+        const baseGeom = new THREE.CylinderGeometry(1.25, 1.25, 0.3, 24);
+        const base = new THREE.Mesh(baseGeom, ironMat);
+        base.position.y = -1.85;
+        group.add(base);
+
+        // Handle pillars
+        const pillarGeom = new THREE.CylinderGeometry(0.24, 0.24, 1.2, 16);
+        const leftPillar = new THREE.Mesh(pillarGeom, handleMat);
+        leftPillar.position.set(-1.15, 2.0, 0);
+        const rightPillar = new THREE.Mesh(pillarGeom, handleMat);
+        rightPillar.position.set(1.15, 2.0, 0);
+        group.add(leftPillar, rightPillar);
+
+        // Handle curved arch
+        const archGeom = new THREE.TorusGeometry(1.15, 0.24, 16, 24, Math.PI);
+        const arch = new THREE.Mesh(archGeom, handleMat);
+        arch.position.set(0, 2.6, 0);
+        group.add(arch);
+
+        // Accent competition bands on horn bases
+        const bandGeom = new THREE.TorusGeometry(0.27, 0.05, 8, 20);
+        const bandL = new THREE.Mesh(bandGeom, accentMat);
+        bandL.position.set(-1.15, 2.3, 0);
+        bandL.rotation.x = Math.PI / 2;
+        const bandR = new THREE.Mesh(bandGeom, accentMat);
+        bandR.position.set(1.15, 2.3, 0);
+        bandR.rotation.x = Math.PI / 2;
+        group.add(bandL, bandR);
+
+        // Weight badge cylinder on front
+        const badgeGeom = new THREE.CylinderGeometry(0.8, 0.8, 0.1, 20);
+        const badge = new THREE.Mesh(badgeGeom, ironMat);
+        badge.position.set(0, 0.2, 2.02);
+        badge.rotation.x = Math.PI / 2;
+        group.add(badge);
+
+        group.accentMat = accentMat;
+        return group;
+      }
+
+      // 3. Olympic Weight Plate / Bumper Plate (Lower right deep background with blur/depth effect)
+      function createOlympicPlateModel(secColor) {
+        const group = new THREE.Group();
+
+        // Rubber bumper disc with depth-of-field opacity
+        const rubberMat = new THREE.MeshStandardMaterial({
+          color: 0x14151a,
+          metalness: 0.45,
+          roughness: 0.65,
+          transparent: true,
+          opacity: 0.76
+        });
+
+        // Stainless steel center hub
+        const hubMat = new THREE.MeshStandardMaterial({
+          color: 0x9fa4b2,
+          metalness: 0.95,
+          roughness: 0.2,
+          transparent: true,
+          opacity: 0.82
+        });
+
+        // Bore hole dark interior
+        const boreMat = new THREE.MeshBasicMaterial({ color: 0x050507 });
+
+        // Accent outer lip ring
+        const accentMat = new THREE.MeshBasicMaterial({
+          color: secColor,
+          transparent: true,
+          opacity: 0.75
+        });
+
+        // Outer rubber plate disc
+        const outerGeom = new THREE.CylinderGeometry(3.5, 3.5, 0.65, 36);
+        const outerDisc = new THREE.Mesh(outerGeom, rubberMat);
+        group.add(outerDisc);
+
+        // Recessed rim channel
+        const recessGeom = new THREE.CylinderGeometry(2.9, 2.9, 0.45, 36);
+        const recessDisc = new THREE.Mesh(recessGeom, rubberMat);
+        group.add(recessDisc);
+
+        // Outer glowing lip ring
+        const lipGeom = new THREE.TorusGeometry(3.42, 0.07, 10, 36);
+        const lip = new THREE.Mesh(lipGeom, accentMat);
+        lip.rotation.x = Math.PI / 2;
+        group.add(lip);
+
+        // Center hub
+        const hubGeom = new THREE.CylinderGeometry(1.2, 1.2, 0.68, 28);
+        const hub = new THREE.Mesh(hubGeom, hubMat);
+        group.add(hub);
+
+        // Barbell bore hole
+        const boreGeom = new THREE.CylinderGeometry(0.5, 0.5, 0.72, 24);
+        const bore = new THREE.Mesh(boreGeom, boreMat);
+        group.add(bore);
+
+        group.accentMat = accentMat;
+        return group;
+      }
+
+      // Instantiate Gym Objects
+      const dumbbell = createDumbbellModel(initialSecColor);
+      scene.add(dumbbell);
+
+      const kettlebell = createKettlebellModel(initialSecColor);
+      scene.add(kettlebell);
+
+      const plate = createOlympicPlateModel(initialSecColor);
+      scene.add(plate);
+
+      // ─────────────────────────────────────────────────────────
+      // DEPTH OF FIELD & BOKEH BLUR PARTICLES
+      // ─────────────────────────────────────────────────────────
+      function createBokehTexture() {
+        const bCanvas = document.createElement('canvas');
+        bCanvas.width = 128;
+        bCanvas.height = 128;
+        const ctx = bCanvas.getContext('2d');
+        const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+        grad.addColorStop(0.25, 'rgba(255, 255, 255, 0.45)');
+        grad.addColorStop(0.55, 'rgba(255, 255, 255, 0.12)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+        return new THREE.CanvasTexture(bCanvas);
+      }
+
+      const bokehCount = 35;
+      const bokehGeom = new THREE.BufferGeometry();
+      const bokehPos = new Float32Array(bokehCount * 3);
+      const bokehColors = new Float32Array(bokehCount * 3);
+
+      for (let i = 0; i < bokehCount; i++) {
+        const i3 = i * 3;
+        bokehPos[i3] = (Math.random() - 0.5) * 65;
+        bokehPos[i3 + 1] = (Math.random() - 0.5) * 45;
+        bokehPos[i3 + 2] = -6 - Math.random() * 30; // Floating deep in z-space
+
+        if (Math.random() > 0.5) {
+          bokehColors[i3] = initialSecColor.r;
+          bokehColors[i3 + 1] = initialSecColor.g;
+          bokehColors[i3 + 2] = initialSecColor.b;
+        } else {
+          bokehColors[i3] = 0.6;
+          bokehColors[i3 + 1] = 0.6;
+          bokehColors[i3 + 2] = 0.65;
+        }
+      }
+
+      bokehGeom.setAttribute('position', new THREE.BufferAttribute(bokehPos, 3));
+      bokehGeom.setAttribute('color', new THREE.BufferAttribute(bokehColors, 3));
+
+      const bokehMat = new THREE.PointsMaterial({
+        size: 24.0,
+        map: createBokehTexture(),
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.22,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+
+      const bokehSystem = new THREE.Points(bokehGeom, bokehMat);
+      scene.add(bokehSystem);
+
+      // ─────────────────────────────────────────────────────────
+      // DYNAMIC 3D PARTICLE GALAXY (750 PARTICLES)
+      // ─────────────────────────────────────────────────────────
       const particleCount = 750;
       const geomParticles = new THREE.BufferGeometry();
       const positions = new Float32Array(particleCount * 3);
@@ -2142,15 +2631,15 @@
 
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        positions[i3] = (Math.random() - 0.5) * 80;
-        positions[i3 + 1] = (Math.random() - 0.5) * 80;
-        positions[i3 + 2] = (Math.random() - 0.5) * 60;
+        positions[i3] = (Math.random() - 0.5) * 85;
+        positions[i3 + 1] = (Math.random() - 0.5) * 85;
+        positions[i3 + 2] = (Math.random() - 0.5) * 65;
 
         if (Math.random() > 0.4) {
-          particleType[i] = 1; // Accent particle
-          colors[i3] = initialColor.r; 
-          colors[i3 + 1] = initialColor.g; 
-          colors[i3 + 2] = initialColor.b;
+          particleType[i] = 1; // Secondary Accent particle
+          colors[i3] = initialSecColor.r; 
+          colors[i3 + 1] = initialSecColor.g; 
+          colors[i3 + 2] = initialSecColor.b;
         } else {
           particleType[i] = 0; // Silver metallic particle
           colors[i3] = 0.45; 
@@ -2163,7 +2652,7 @@
       geomParticles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
       const matParticles = new THREE.PointsMaterial({
-        size: 0.8,
+        size: 0.85,
         vertexColors: true,
         transparent: true,
         opacity: 0.65
@@ -2171,57 +2660,130 @@
       const particleSystem = new THREE.Points(geomParticles, matParticles);
       scene.add(particleSystem);
 
-      // Connect particle color updates to particleEngine
-      window.particleEngine.setParticleColor = function(hex) {
-        this.currentColor = hex;
+      // ─────────────────────────────────────────────────────────
+      // RESPONSIVE LAYOUT & BOUNDARY CONTROL
+      // ─────────────────────────────────────────────────────────
+      const baseCoords = {
+        dumbbell: { x: 13.5, y: 3.5, z: -15, scale: 0.58 },
+        kettlebell: { x: -14.5, y: -1.5, z: -17, scale: 0.52 },
+        plate: { x: 15.5, y: -8.5, z: -24, scale: 0.56 }
+      };
+
+      function updateLayout() {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+          // Push further outward so hero text and buttons remain completely clear
+          baseCoords.dumbbell = { x: 16.5, y: 11.0, z: -22, scale: 0.40 };
+          baseCoords.kettlebell = { x: -16.0, y: -13.0, z: -22, scale: 0.38 };
+          baseCoords.plate = { x: 14.5, y: -17.0, z: -28, scale: 0.42 };
+        } else {
+          baseCoords.dumbbell = { x: 13.5, y: 3.5, z: -15, scale: 0.58 };
+          baseCoords.kettlebell = { x: -14.5, y: -1.5, z: -17, scale: 0.52 };
+          baseCoords.plate = { x: 15.5, y: -8.5, z: -24, scale: 0.56 };
+        }
+        dumbbell.scale.setScalar(baseCoords.dumbbell.scale);
+        kettlebell.scale.setScalar(baseCoords.kettlebell.scale);
+        plate.scale.setScalar(baseCoords.plate.scale);
+      }
+      updateLayout();
+
+      // ─────────────────────────────────────────────────────────
+      // DYNAMIC COLOR UPDATER (window.particleEngine.setParticleColor)
+      // ─────────────────────────────────────────────────────────
+      window.particleEngine.setParticleColor = function(secHex, priHex) {
+        this.currentColor = secHex;
         try {
-          const c = new THREE.Color(hex);
-          if (meshIcosa && meshIcosa.material) {
-            meshIcosa.material.color.copy(c);
+          const sColor = new THREE.Color(secHex);
+          const pColor = priHex ? new THREE.Color(priHex) : null;
+
+          // Update Point Lights
+          if (secondaryLight) secondaryLight.color.copy(sColor);
+          if (pColor && primaryLight) primaryLight.color.copy(pColor);
+
+          // Update Accent Glow Rings on Gym Models
+          if (dumbbell.accentMat) dumbbell.accentMat.color.copy(sColor);
+          if (kettlebell.accentMat) kettlebell.accentMat.color.copy(sColor);
+          if (plate.accentMat) plate.accentMat.color.copy(sColor);
+
+          // Update Bokeh Discs
+          if (bokehGeom && bokehGeom.attributes.color) {
+            const bCol = bokehGeom.attributes.color;
+            for (let i = 0; i < bokehCount; i++) {
+              if (i % 2 === 0) {
+                bCol.setXYZ(i, sColor.r, sColor.g, sColor.b);
+              }
+            }
+            bCol.needsUpdate = true;
           }
-          if (meshTorus && meshTorus.material) {
-            meshTorus.material.color.copy(c);
-          }
+
+          // Update Particle Galaxy
           if (particleSystem && particleSystem.geometry && particleSystem.geometry.attributes.color) {
             const colAttr = particleSystem.geometry.attributes.color;
             for (let i = 0; i < particleCount; i++) {
               if (particleType[i] === 1) {
-                colAttr.setXYZ(i, c.r, c.g, c.b);
+                colAttr.setXYZ(i, sColor.r, sColor.g, sColor.b);
               } else {
-                colAttr.setXYZ(i, c.r * 0.2 + 0.35, c.g * 0.2 + 0.35, c.b * 0.2 + 0.4);
+                colAttr.setXYZ(i, sColor.r * 0.25 + 0.35, sColor.g * 0.25 + 0.35, sColor.b * 0.25 + 0.4);
               }
             }
             colAttr.needsUpdate = true;
           }
         } catch (err) {
-          console.warn("Error setting particle color:", err);
+          console.warn("Error updating 3D scene colors:", err);
         }
       };
 
-      // Mouse Parallax Interaction
+      // ─────────────────────────────────────────────────────────
+      // SMOOTH DAMPED PARALLAX & SAFE BOUNDARIES
+      // ─────────────────────────────────────────────────────────
       let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
       window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
-        mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        // Normalized screen coordinates (-1 to 1)
+        mouseX = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+        mouseY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
       });
 
-      // Render Loop
+      // ─────────────────────────────────────────────────────────
+      // ANIMATION & RENDER LOOP
+      // ─────────────────────────────────────────────────────────
       const clock = new THREE.Clock();
+
       function animate() {
         requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
 
-        targetX += (mouseX - targetX) * 0.05;
-        targetY += (mouseY - targetY) * 0.05;
+        // Smooth Damped Parallax Interpolation (0.035 lerp factor)
+        targetX += (mouseX - targetX) * 0.035;
+        targetY += (mouseY - targetY) * 0.035;
 
-        meshIcosa.rotation.x = elapsedTime * 0.08 + targetY * 2;
-        meshIcosa.rotation.y = elapsedTime * 0.12 + targetX * 2;
+        // 1. Dumbbell: Floating & subtle tilting in background, strictly locked in Z
+        dumbbell.position.x = baseCoords.dumbbell.x + targetX * 1.5;
+        dumbbell.position.y = baseCoords.dumbbell.y - targetY * 1.0 + Math.sin(elapsedTime * 0.65) * 0.35;
+        dumbbell.position.z = baseCoords.dumbbell.z; // Z is strictly locked behind UI
+        dumbbell.rotation.x = 0.45 + elapsedTime * 0.04;
+        dumbbell.rotation.y = 0.85 + elapsedTime * 0.06;
 
-        meshTorus.rotation.x = elapsedTime * -0.05;
-        meshTorus.rotation.y = elapsedTime * 0.07;
+        // 2. Kettlebell: Subtle floating on the left side
+        kettlebell.position.x = baseCoords.kettlebell.x + targetX * 1.2;
+        kettlebell.position.y = baseCoords.kettlebell.y - targetY * 0.8 + Math.cos(elapsedTime * 0.55) * 0.3;
+        kettlebell.position.z = baseCoords.kettlebell.z;
+        kettlebell.rotation.y = -0.4 + elapsedTime * 0.05;
+        kettlebell.rotation.z = 0.15 + Math.sin(elapsedTime * 0.4) * 0.08;
 
-        particleSystem.rotation.y = elapsedTime * 0.02 + targetX * 0.8;
-        particleSystem.rotation.x = targetY * 0.8;
+        // 3. Olympic Plate: Deep background blur rotation
+        plate.position.x = baseCoords.plate.x + targetX * 0.7;
+        plate.position.y = baseCoords.plate.y - targetY * 0.5 + Math.sin(elapsedTime * 0.5 + 1.2) * 0.25;
+        plate.position.z = baseCoords.plate.z;
+        plate.rotation.x = 0.5 + elapsedTime * 0.03;
+        plate.rotation.y = 0.35 + elapsedTime * 0.04;
+
+        // 4. Bokeh Discs: Soft depth of field drift
+        bokehSystem.rotation.y = elapsedTime * 0.01 + targetX * 0.25;
+        bokehSystem.rotation.x = -targetY * 0.25;
+
+        // 5. Dynamic Particle Galaxy
+        particleSystem.rotation.y = elapsedTime * 0.015 + targetX * 0.5;
+        particleSystem.rotation.x = targetY * 0.5;
 
         renderer.render(scene, camera);
       }
@@ -2231,6 +2793,7 @@
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        updateLayout();
       });
     })();
 
@@ -2256,10 +2819,11 @@
     function applyPreset(business, color, pcolor, location, cta, sub) {
       const currentHash = window.location.hash || '#home';
       const cleanHash = currentHash.split('?')[0];
-      const newUrl = `${window.location.pathname}?business=${encodeURIComponent(business)}&color=${color}&pcolor=${pcolor}&location=${encodeURIComponent(location)}&cta=${encodeURIComponent(cta)}&sub=${encodeURIComponent(sub)}${cleanHash}`;
+      const pcolorQuery = pcolor ? `&pcolor=${pcolor}` : '';
+      const newUrl = `${window.location.pathname}?business=${encodeURIComponent(business)}&color=${color}${pcolorQuery}&location=${encodeURIComponent(location)}&cta=${encodeURIComponent(cta)}&sub=${encodeURIComponent(sub)}${cleanHash}`;
       window.history.pushState(null, '', newUrl);
       initDynamicLandingPage();
-      showToast('Preset Loaded', `${business} applied seamlessly!`);
+      showToast('Preset Loaded', `${business} applied with dual contrast!`);
     }
 
     function toggleParamTester() {
