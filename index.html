@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>KRONOS APEX | Luxury 3D Fitness Sanctuary</title>
+  <meta name="description" content="Kronos Apex Fitness Sanctuary. Elite biomechanics, Olympic iron, 24/7 biometric access, infrared recovery & championship coaching in a dark luxury atmosphere.">
+  <meta name="theme-color" content="#09090b">
+
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6.5.1 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS via CDN with Custom Theme Config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            heading: ['Outfit', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          colors: {
+            crimson: {
+              300: '#fca5a5',
+              400: '#f87171',
+              500: '#ef4444',
+              600: '#dc2626',
+              700: '#b91c1c',
+              800: '#991b1b',
+              900: '#7f1d1d',
+              950: '#450a0a'
+            },
+            deep: {
+              950: '#050507',
+              900: '#09090b',
+              850: '#0e0e13',
+              800: '#14141b',
+              750: '#1b1b24',
+              700: '#232330'
+            }
+          },
+          boxShadow: {
+            'crimson-sm': '0 0 15px -3px rgba(220, 38, 38, 0.3)',
+            'crimson-md': '0 0 25px -4px rgba(220, 38, 38, 0.45)',
+            'crimson-lg': '0 0 45px -5px rgba(220, 38, 38, 0.6)',
+            'crimson-glow': '0 0 30px rgba(220, 38, 38, 0.35)',
+            'inner-crimson': 'inset 0 0 20px rgba(220, 38, 38, 0.2)'
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 6s ease-in-out infinite',
+            'glow-pulse': 'glowPulse 3s ease-in-out infinite'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' }
+            },
+            glowPulse: {
+              '0%, 100%': { opacity: '0.4' },
+              '50%': { opacity: '0.9' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Three.js for 3D Background Visual Canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 4px;
+      border: 2px solid #09090b;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #dc2626;
+    }
+
+    /* Glassmorphism Classes */
+    .glass-panel {
+      background: rgba(14, 14, 19, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-card {
+      background: rgba(18, 18, 25, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      background: rgba(24, 24, 34, 0.85);
+      border-color: rgba(220, 38, 38, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px -10px rgba(220, 38, 38, 0.2);
+    }
+    .glass-crimson {
+      background: rgba(220, 38, 38, 0.08);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+    }
+
+    /* View Transition Animations */
+    .page-view {
+      display: none;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+    }
+    .page-view.active-view {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Text Glow Effects */
+    .text-glow-crimson {
+      text-shadow: 0 0 25px rgba(220, 38, 38, 0.65);
+    }
+
+    /* Custom Range Sliders for BMI */
+    input[type=range] {
+      accent-color: #dc2626;
+    }
+
+    /* 3D Background Canvas */
+    #three-bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+
+<body class="bg-deep-950 text-zinc-100 font-sans antialiased overflow-x-hidden selection:bg-crimson-600 selection:text-white relative">
+
+  <!-- ═══════════════════════════════════════════════════════
+       INTERACTIVE 3D THREE.JS CANVAS BACKGROUND
+  ════════════════════════════════════════════════════════ -->
+  <canvas id="three-bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient Vignette & Crimson Atmospheric Glows -->
+  <div class="fixed inset-0 pointer-events-none z-[1] bg-[radial-gradient(circle_at_50%_0%,rgba(220,38,38,0.18)_0%,transparent_60%)]"></div>
+  <div class="fixed bottom-0 left-0 right-0 h-96 pointer-events-none z-[1] bg-gradient-to-t from-deep-950 via-deep-950/60 to-transparent"></div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       FIXED TOP NAVIGATION BAR
+  ════════════════════════════════════════════════════════ -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-panel border-b border-white/[0.08]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Brand Logo -->
+        <a href="#home" class="flex items-center gap-3.5 group cursor-pointer focus:outline-none">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center shadow-crimson-sm border border-crimson-500/40 group-hover:shadow-crimson-md group-hover:scale-105 transition-all duration-300">
+            <i class="fa-solid fa-dumbbell text-white text-xl transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-heading font-black tracking-wider text-xl lg:text-2xl text-white flex items-center gap-1">
+              KRONOS <span class="text-crimson-500 text-glow-crimson font-light">APEX</span>
+            </span>
+            <span class="text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium -mt-1">Sanctuary of Iron</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1 lg:gap-2 p-1.5 rounded-full bg-deep-900/70 border border-white/5 shadow-inner">
+          <a href="#home" data-nav="home" class="nav-link px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/5">
+            <i class="fa-solid fa-house-chimney text-xs mr-1.5 text-zinc-500 group-hover:text-crimson-500"></i>Home
+          </a>
+          <a href="#membership" data-nav="membership" class="nav-link px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/5">
+            <i class="fa-solid fa-crown text-xs mr-1.5 text-zinc-500"></i>Memberships
+          </a>
+          <a href="#shop" data-nav="shop" class="nav-link px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/5">
+            <i class="fa-solid fa-bag-shopping text-xs mr-1.5 text-zinc-500"></i>Shop
+          </a>
+          <a href="#facilities" data-nav="facilities" class="nav-link px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/5">
+            <i class="fa-solid fa-layer-group text-xs mr-1.5 text-zinc-500"></i>Facilities
+          </a>
+          <a href="#contact" data-nav="contact" class="nav-link px-4 py-2 rounded-full text-sm font-medium tracking-wide transition-all duration-200 text-zinc-300 hover:text-white hover:bg-white/5">
+            <i class="fa-solid fa-location-dot text-xs mr-1.5 text-zinc-500"></i>Contact
+          </a>
+        </nav>
+
+        <!-- Right Action Buttons -->
+        <div class="hidden sm:flex items-center gap-3">
+          <!-- Cart Drawer Trigger Button -->
+          <button id="open-cart-btn" onclick="toggleCartDrawer(true)" class="relative p-2.5 rounded-xl bg-deep-850 hover:bg-deep-800 border border-white/10 text-zinc-300 hover:text-white transition-all duration-200 focus:outline-none" aria-label="View Shopping Cart">
+            <i class="fa-solid fa-cart-shopping text-base"></i>
+            <span id="cart-counter-badge" class="absolute -top-1.5 -right-1.5 bg-crimson-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-deep-950 shadow-crimson-sm transition-transform scale-0">0</span>
+          </button>
+
+          <!-- WhatsApp Quick Action -->
+          <a href="https://wa.me/14805550198?text=Hello%20Kronos%20Apex!%20I%20would%20like%20to%20inquire%20about%20a%20VIP%20membership." target="_blank" rel="noopener noreferrer" class="p-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 transition-all duration-200 focus:outline-none" title="Quick WhatsApp Concierge">
+            <i class="fa-brands fa-whatsapp text-lg"></i>
+          </a>
+
+          <!-- VIP Membership Modal Button -->
+          <button onclick="openMembershipModal('VIP Apex Pass')" class="relative group overflow-hidden px-5 py-2.5 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white font-heading font-semibold text-sm tracking-wider shadow-crimson-sm hover:shadow-crimson-md transition-all duration-300 focus:outline-none flex items-center gap-2">
+            <span class="relative z-10">JOIN NOW</span>
+            <i class="fa-solid fa-bolt text-xs text-amber-300 animate-pulse relative z-10"></i>
+            <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+          </button>
+        </div>
+
+        <!-- Mobile Controls (Cart & Hamburger) -->
+        <div class="flex items-center gap-2 md:hidden">
+          <button onclick="toggleCartDrawer(true)" class="relative p-2.5 rounded-lg bg-deep-850 border border-white/10 text-zinc-300" aria-label="Cart">
+            <i class="fa-solid fa-cart-shopping text-sm"></i>
+            <span id="mobile-cart-badge" class="absolute -top-1 -right-1 bg-crimson-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center scale-0">0</span>
+          </button>
+          
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2.5 rounded-lg bg-deep-850 hover:bg-deep-800 border border-white/10 text-zinc-300 hover:text-white focus:outline-none" aria-label="Toggle Mobile Navigation">
+            <i id="mobile-menu-icon" class="fa-solid fa-bars text-lg"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-white/10 bg-deep-900/95 backdrop-blur-2xl px-4 pt-3 pb-6 space-y-2">
+      <a href="#home" onclick="closeMobileMenu()" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-zinc-200 hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-house-chimney w-5 text-crimson-500"></i> Home
+      </a>
+      <a href="#membership" onclick="closeMobileMenu()" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-zinc-200 hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-crown w-5 text-crimson-500"></i> Memberships
+      </a>
+      <a href="#shop" onclick="closeMobileMenu()" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-zinc-200 hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-bag-shopping w-5 text-crimson-500"></i> Pro Shop
+      </a>
+      <a href="#facilities" onclick="closeMobileMenu()" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-zinc-200 hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-layer-group w-5 text-crimson-500"></i> Facilities
+      </a>
+      <a href="#contact" onclick="closeMobileMenu()" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-zinc-200 hover:bg-white/5 transition-colors">
+        <i class="fa-solid fa-location-dot w-5 text-crimson-500"></i> Contact & Hours
+      </a>
+      <div class="pt-3 border-t border-white/10 flex flex-col gap-2">
+        <button onclick="closeMobileMenu(); openMembershipModal('Mobile VIP Pass');" class="w-full py-3 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 text-white font-heading font-bold text-center tracking-wider shadow-crimson-sm">
+          CLAIM 3-DAY VIP PASS
+        </button>
+        <a href="https://wa.me/14805550198" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-400 font-medium text-sm text-center flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-base"></i> Direct WhatsApp Concierge
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MAIN APPLICATION VIEWS (HASH ROUTING CONTAINER)
+  ════════════════════════════════════════════════════════ -->
+  <main class="relative z-10 pt-20">
+
+    <!-- ───────────────────────────────────────────────────
+         1. HOME VIEW (#home)
+    ──────────────────────────────────────────────────── -->
+    <section id="view-home" class="page-view active-view min-h-screen">
+      
+      <!-- HERO SECTION -->
+      <div class="relative min-h-[92vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 overflow-hidden">
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+          
+          <!-- Futuristic Status Tag -->
+          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-crimson-950/70 border border-crimson-600/40 text-crimson-400 text-xs sm:text-sm font-semibold tracking-wider uppercase mb-8 shadow-inner-crimson">
+            <span class="w-2 h-2 rounded-full bg-crimson-500 animate-ping"></span>
+            <span>24/7 Biometric Access • Olympic Caliber Iron</span>
+          </div>
+
+          <!-- Main Hero Headline -->
+          <h1 class="font-heading font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight leading-[1.05] text-white uppercase mb-6">
+            FORGE YOUR <br>
+            <span class="bg-gradient-to-r from-white via-zinc-200 to-crimson-500 bg-clip-text text-transparent">
+              ULTIMATE
+            </span>
+            <span class="text-crimson-600 text-glow-crimson italic">PHYSIQUE</span>
+          </h1>
+
+          <!-- Tagline Subtitle -->
+          <p class="max-w-2xl mx-auto text-zinc-300 text-base sm:text-lg lg:text-xl font-normal leading-relaxed mb-10">
+            A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.
+          </p>
+
+          <!-- Call to Action Buttons -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 mb-16">
+            <a href="#membership" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-crimson-600 via-crimson-700 to-crimson-800 hover:from-crimson-500 hover:to-crimson-700 text-white font-heading font-bold text-base tracking-wider shadow-crimson-md hover:shadow-crimson-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+              <span>EXPLORE MEMBERSHIPS</span>
+              <i class="fa-solid fa-arrow-right text-sm"></i>
+            </a>
+            <button onclick="openMembershipModal('3-Day Free Trial')" class="w-full sm:w-auto px-8 py-4 rounded-xl glass-panel hover:bg-white/10 text-white font-heading font-semibold text-base tracking-wider border border-white/20 hover:border-crimson-500/50 transition-all duration-300 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-ticket text-crimson-500"></i>
+              <span>CLAIM 3-DAY PASS</span>
+            </button>
+          </div>
+
+          <!-- Live Metrics / Stats Ribbon -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-8 border-t border-white/10 max-w-4xl mx-auto">
+            <div class="p-4 rounded-2xl glass-card text-center">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">18,500 <span class="text-crimson-500 text-xl">SQ FT</span></div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Multi-Level Arena</p>
+            </div>
+            <div class="p-4 rounded-2xl glass-card text-center">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">150 <span class="text-crimson-500 text-xl">LBS</span></div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Max Dumbbells</p>
+            </div>
+            <div class="p-4 rounded-2xl glass-card text-center">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">4.95 <span class="text-amber-400 text-lg">★</span></div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">850+ Elite Members</p>
+            </div>
+            <div class="p-4 rounded-2xl glass-card text-center">
+              <div class="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight">24/7 <span class="text-crimson-500 text-xl">KEY</span></div>
+              <p class="text-xs uppercase tracking-widest text-zinc-400 mt-1">Biometric Entry</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- "OUR STORY" SECTION -->
+      <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5 relative">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          
+          <!-- Story Narrative Content -->
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em]">
+              <i class="fa-solid fa-fire-flame-curved"></i> The Kronos Genesis
+            </div>
+            <h2 class="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
+              REJECT THE ORDINARY. <br>
+              <span class="text-crimson-600">ENGINEERED FOR THE UNRELENTING.</span>
+            </h2>
+            <p class="text-zinc-300 text-base sm:text-lg leading-relaxed font-normal">
+              Founded in 2021 by competitive powerlifters and biomechanical engineers, Kronos Apex was built with a singular premise: commercial health clubs have sanitized the spirit of true physical transformation.
+            </p>
+            <p class="text-zinc-400 text-sm sm:text-base leading-relaxed">
+              We eliminated broken selectorized cable stations, crowded generic classes, and restrictive gym rules. In their place stands an uncompromising dark iron sanctuary featuring Swedish Eleiko barbell plates, custom-fabricated cambered bars, 50-meter indoor sprint turf, and cold water plunge therapy.
+            </p>
+
+            <!-- Ethos Pillars Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+              <div class="p-4 rounded-xl glass-card border-l-2 border-crimson-600">
+                <h4 class="font-heading font-bold text-white text-base flex items-center gap-2">
+                  <i class="fa-solid fa-atom text-crimson-500"></i> Pure Biomechanics
+                </h4>
+                <p class="text-xs text-zinc-400 mt-1">Every machine is handpicked for optimal resistance profiles and natural joint articulation.</p>
+              </div>
+              <div class="p-4 rounded-xl glass-card border-l-2 border-crimson-600">
+                <h4 class="font-heading font-bold text-white text-base flex items-center gap-2">
+                  <i class="fa-solid fa-temperature-arrow-down text-crimson-500"></i> Contrast Therapy
+                </h4>
+                <p class="text-xs text-zinc-400 mt-1">Full Finnish dry heat saunas and 42°F cold immersion plunge tanks for rapid central nervous recovery.</p>
+              </div>
+            </div>
+
+            <!-- Founder Quote Block -->
+            <div class="p-5 rounded-2xl glass-crimson border border-crimson-600/30 flex items-start gap-4">
+              <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-crimson-500">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Marcus Vance - Founder" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <p class="text-sm italic text-zinc-200">"We do not promise comfort; we build resilience. Walk through these heavy steel doors ready to transcend your genetic limits."</p>
+                <div class="text-xs font-heading font-bold text-crimson-400 mt-2 uppercase tracking-wider">Marcus Vance — Head Strength Architect</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Story Visual Card Grid -->
+          <div class="lg:col-span-5 relative">
+            <div class="relative mx-auto rounded-3xl overflow-hidden border border-white/10 shadow-2xl group">
+              <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=900&q=80" alt="Gym Sanctuary Floor" class="w-full h-[460px] object-cover group-hover:scale-105 transition-transform duration-700">
+              <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/40 to-transparent"></div>
+              
+              <!-- Floating Overlay Badge -->
+              <div class="absolute bottom-6 left-6 right-6 p-5 rounded-2xl glass-panel border border-white/15">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs uppercase tracking-widest text-crimson-400 font-bold">Standard of Excellence</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] bg-crimson-600 text-white font-bold">PRO LEVEL</span>
+                </div>
+                <div class="font-heading font-bold text-lg text-white">The Calibrated Competition Platform</div>
+                <div class="text-xs text-zinc-300 mt-1">IPF & USAPL certified competition racks, deadlift platforms with vibration dampening timber.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- INTERACTIVE GALLERY SECTION -->
+      <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-3">
+            <i class="fa-solid fa-camera"></i> Visual Tour
+          </div>
+          <h2 class="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight">
+            THE SANCTUARY IN ACTION
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-3">Click on any image to open the high-definition interactive lightbox viewer.</p>
+          
+          <!-- Category Filter Buttons -->
+          <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+            <button onclick="filterGallery('all')" class="gallery-filter-btn active px-4 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all">All Zones</button>
+            <button onclick="filterGallery('iron')" class="gallery-filter-btn px-4 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Heavy Iron</button>
+            <button onclick="filterGallery('cardio')" class="gallery-filter-btn px-4 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Cardio Deck</button>
+            <button onclick="filterGallery('turf')" class="gallery-filter-btn px-4 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Turf & Rigs</button>
+            <button onclick="filterGallery('recovery')" class="gallery-filter-btn px-4 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Spa & Recovery</button>
+          </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Image 1 -->
+          <div class="gallery-item iron group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80', 'Heavy Free Weight Arsenal', 'Calibrated dumbbell rows extending smoothly up to 150 lbs, supported by heavy duty steel frames.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80" alt="Free Weights" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Heavy Iron</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Dumbbell & Barbell Vault</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image 2 -->
+          <div class="gallery-item iron group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80', 'Olympic Power Racks', 'Laser-cut monolifts, band pegs, and spotter pins designed for world-class squatting & pressing.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=700&q=80" alt="Power Rack" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Heavy Iron</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Olympic Power Stations</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image 3 -->
+          <div class="gallery-item turf group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=1200&q=80', '50-Meter Performance Turf', 'Sprint sleds, weighted prowlers, battle ropes, and functional rig towers.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=700&q=80" alt="Crossfit Turf" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Turf & Rigs</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Crossfit Sprint Corridor</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image 4 -->
+          <div class="gallery-item cardio group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1200&q=80', 'Biometric Cardio Arena', 'Woodway curved manual treadmills, StairMasters, and Concept2 rowers with pulse tracking.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=700&q=80" alt="Cardio Arena" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Cardio Deck</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Metabolic Cardio Deck</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image 5 -->
+          <div class="gallery-item recovery group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80', 'Infrared Sauna & Recovery Bath', 'Private cedar wood saunas and stainless steel filtered cold immersion tubs.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=700&q=80" alt="Recovery Suite" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Recovery Spa</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Infrared & Contrast Spa</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image 6 -->
+          <div class="gallery-item iron group relative rounded-2xl overflow-hidden glass-card cursor-pointer border border-white/10" onclick="openLightbox('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=80', 'Prime Plate-Loaded Machines', 'Variable cam angles and smart-pin load settings to isolate muscle fibers with zero wasted torque.')">
+            <div class="h-64 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=700&q=80" alt="Heavy Lat Pulldown" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/20 to-transparent opacity-90 group-hover:opacity-75 transition-opacity"></div>
+            <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-crimson-400 bg-crimson-950/80 px-2 py-0.5 rounded border border-crimson-800">Heavy Iron</span>
+                <h4 class="font-heading font-bold text-white text-base mt-1">Leverage & Cam Stations</h4>
+              </div>
+              <div class="w-9 h-9 rounded-full bg-crimson-600/80 flex items-center justify-center text-white transform group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-expand text-xs"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- LIVE INTERACTIVE BMI CALCULATOR SECTION -->
+      <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+        <div class="max-w-4xl mx-auto glass-panel p-6 sm:p-10 rounded-3xl border border-white/15 relative overflow-hidden shadow-2xl">
+          
+          <!-- Background Glow Effect -->
+          <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-crimson-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="text-center max-w-2xl mx-auto mb-10">
+            <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-2">
+              <i class="fa-solid fa-calculator"></i> Biometric Analysis
+            </div>
+            <h2 class="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight">
+              INTERACTIVE BMI CALCULATOR
+            </h2>
+            <p class="text-zinc-400 text-sm mt-2">Calculate your Body Mass Index in real time and unlock personalized training recommendations.</p>
+
+            <!-- Unit Toggle (Metric / Imperial) -->
+            <div class="inline-flex p-1 rounded-xl bg-deep-900 border border-white/10 mt-6">
+              <button id="bmi-unit-metric" onclick="setBmiUnit('metric')" class="px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all">Metric (cm / kg)</button>
+              <button id="bmi-unit-imperial" onclick="setBmiUnit('imperial')" class="px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all">Imperial (in / lbs)</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            <!-- Input Sliders & Fields -->
+            <div class="md:col-span-7 space-y-6">
+              
+              <!-- Height Input -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center text-sm">
+                  <label id="bmi-height-label" class="font-medium text-zinc-300">Height (cm)</label>
+                  <span id="bmi-height-val" class="font-heading font-bold text-crimson-400 text-lg">178 cm</span>
+                </div>
+                <input id="bmi-height-slider" type="range" min="120" max="230" value="178" oninput="calculateBMI()" class="w-full h-2 bg-deep-800 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-[11px] text-zinc-500">
+                  <span id="bmi-height-min">120 cm</span>
+                  <span id="bmi-height-max">230 cm</span>
+                </div>
+              </div>
+
+              <!-- Weight Input -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center text-sm">
+                  <label id="bmi-weight-label" class="font-medium text-zinc-300">Weight (kg)</label>
+                  <span id="bmi-weight-val" class="font-heading font-bold text-crimson-400 text-lg">78 kg</span>
+                </div>
+                <input id="bmi-weight-slider" type="range" min="40" max="180" value="78" oninput="calculateBMI()" class="w-full h-2 bg-deep-800 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-[11px] text-zinc-500">
+                  <span id="bmi-weight-min">40 kg</span>
+                  <span id="bmi-weight-max">180 kg</span>
+                </div>
+              </div>
+
+              <!-- Gender Selection -->
+              <div class="pt-2">
+                <label class="block text-sm font-medium text-zinc-300 mb-2">Biological Assessment</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button type="button" class="gender-btn active py-2.5 rounded-xl border border-crimson-600 bg-crimson-950/40 text-white text-xs font-heading font-semibold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-mars text-crimson-500"></i> Male
+                  </button>
+                  <button type="button" class="gender-btn py-2.5 rounded-xl border border-white/10 bg-deep-850 hover:bg-white/5 text-zinc-400 hover:text-white text-xs font-heading font-semibold flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-venus text-pink-500"></i> Female
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Dynamic Result Card & Gauge -->
+            <div class="md:col-span-5">
+              <div class="p-6 rounded-2xl glass-card border border-white/10 text-center relative overflow-hidden">
+                <span class="text-xs uppercase tracking-widest text-zinc-400 font-semibold">Your Live BMI Score</span>
+                
+                <!-- Large Number Display -->
+                <div id="bmi-score" class="font-heading font-black text-5xl sm:text-6xl text-white my-3 tracking-tight text-glow-crimson">
+                  24.6
+                </div>
+
+                <!-- Status Badge -->
+                <div id="bmi-category" class="inline-flex px-4 py-1 rounded-full text-xs font-heading font-bold tracking-wider uppercase bg-emerald-950 text-emerald-400 border border-emerald-500/40 mb-4">
+                  Normal Weight
+                </div>
+
+                <!-- Dynamic Progress Gauge -->
+                <div class="w-full bg-deep-800 h-3 rounded-full overflow-hidden p-0.5 border border-white/10 mb-4 relative">
+                  <div class="absolute inset-0 flex">
+                    <div class="w-1/4 bg-blue-500/40" title="Underweight"></div>
+                    <div class="w-1/4 bg-emerald-500/40" title="Normal"></div>
+                    <div class="w-1/4 bg-amber-500/40" title="Overweight"></div>
+                    <div class="w-1/4 bg-red-600/40" title="Obese"></div>
+                  </div>
+                  <div id="bmi-gauge-indicator" class="h-full bg-white rounded-full relative z-10 transition-all duration-300 w-[55%]"></div>
+                </div>
+
+                <!-- Prescription Box -->
+                <div class="p-3.5 rounded-xl bg-deep-900/80 border border-white/5 text-left text-xs space-y-1">
+                  <div class="font-heading font-bold text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-bullseye text-crimson-500"></i> Recommended Protocol:
+                  </div>
+                  <p id="bmi-advice" class="text-zinc-400 text-[11px] leading-relaxed">
+                    Optimal body composition for lean muscle hypertrophy and explosive conditioning. Focus on progressive overload.
+                  </p>
+                </div>
+
+                <a href="#membership" class="mt-4 block w-full py-2.5 rounded-xl bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase tracking-wider transition-colors">
+                  Build Custom Routine
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- TESTIMONIALS SECTION -->
+      <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-2">
+            <i class="fa-solid fa-trophy"></i> Proven Transformations
+          </div>
+          <h2 class="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight">
+            FORGED IN OUR CRUCIBLE
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-2">Hear from competitive athletes, executives, and dedicated lifters who call Kronos their home.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Review 1 -->
+          <div class="p-7 rounded-2xl glass-card flex flex-col justify-between border-t-2 border-crimson-600">
+            <div>
+              <div class="flex items-center gap-1 text-amber-400 text-xs mb-4">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                <span class="text-zinc-500 text-[11px] ml-2">Verified Athlete</span>
+              </div>
+              <p class="text-zinc-300 text-sm leading-relaxed italic">
+                "I've trained in Olympic facilities across North America. Kronos Apex is the only gym where every single piece of steel is maintained to perfection. The infrared recovery sauna shaved days off my heavy squat deload cycles."
+              </p>
+            </div>
+            <div class="flex items-center gap-3.5 mt-6 pt-5 border-t border-white/5">
+              <div class="w-11 h-11 rounded-full overflow-hidden border border-crimson-500/50">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" alt="Liam Rodriguez" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-white text-sm">Liam Rodriguez</h4>
+                <p class="text-xs text-crimson-400 font-medium">USPA Powerlifter • 725 lb Squat</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="p-7 rounded-2xl glass-card flex flex-col justify-between border-t-2 border-crimson-600">
+            <div>
+              <div class="flex items-center gap-1 text-amber-400 text-xs mb-4">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                <span class="text-zinc-500 text-[11px] ml-2">Verified Athlete</span>
+              </div>
+              <p class="text-zinc-300 text-sm leading-relaxed italic">
+                "The atmosphere is electric. Zero tripods blocking pathways, zero influencers wasting time. Just intense focus, incredible lighting, and world-class equipment that actually protects your shoulders and joints."
+              </p>
+            </div>
+            <div class="flex items-center gap-3.5 mt-6 pt-5 border-t border-white/5">
+              <div class="w-11 h-11 rounded-full overflow-hidden border border-crimson-500/50">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80" alt="Elena Rostova" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-white text-sm">Elena Rostova</h4>
+                <p class="text-xs text-crimson-400 font-medium">IFBB Pro Figure Competitor</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Review 3 -->
+          <div class="p-7 rounded-2xl glass-card flex flex-col justify-between border-t-2 border-crimson-600">
+            <div>
+              <div class="flex items-center gap-1 text-amber-400 text-xs mb-4">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                <span class="text-zinc-500 text-[11px] ml-2">Verified Athlete</span>
+              </div>
+              <p class="text-zinc-300 text-sm leading-relaxed italic">
+                "The 24/7 keycard entry allows me to train at 4:30 AM before executive board meetings. Clean, private luxury locker rooms with rainfall showers make heading straight to the office seamless."
+              </p>
+            </div>
+            <div class="flex items-center gap-3.5 mt-6 pt-5 border-t border-white/5">
+              <div class="w-11 h-11 rounded-full overflow-hidden border border-crimson-500/50">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80" alt="David Sterling" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <h4 class="font-heading font-bold text-white text-sm">David Sterling</h4>
+                <p class="text-xs text-crimson-400 font-medium">Managing Director & Triathlete</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- FREQUENTLY ASKED QUESTIONS (ACCORDION) -->
+      <section class="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/5">
+        <div class="text-center mb-14">
+          <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-2">
+            <i class="fa-solid fa-circle-question"></i> Answers
+          </div>
+          <h2 class="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight">
+            FREQUENTLY ASKED QUESTIONS
+          </h2>
+          <p class="text-zinc-400 text-sm mt-2">Everything you need to know before stepping into the arena.</p>
+        </div>
+
+        <div class="space-y-4">
+          
+          <!-- Accordion 1 -->
+          <div class="faq-card glass-card rounded-2xl border border-white/10 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none">
+              <span class="font-heading font-bold text-base sm:text-lg text-white">How does 24/7 biometric keycard access work?</span>
+              <i class="fa-solid fa-chevron-down text-crimson-500 transform transition-transform duration-300"></i>
+            </button>
+            <div class="faq-content hidden px-6 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+              Upon membership activation, you receive an encrypted NFC biometric card and digital smartphone credential synced to our high-security portal. Access is active 24/7/365 with dual infrared surveillance and emergency concierge response.
+            </div>
+          </div>
+
+          <!-- Accordion 2 -->
+          <div class="faq-card glass-card rounded-2xl border border-white/10 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none">
+              <span class="font-heading font-bold text-base sm:text-lg text-white">Can I bring training partners or guests?</span>
+              <i class="fa-solid fa-chevron-down text-crimson-500 transform transition-transform duration-300"></i>
+            </button>
+            <div class="faq-content hidden px-6 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+              Yes. Pro Members receive 2 complimentary guest passes per month, and VIP Apex Black tier members enjoy unlimited guest privileges during staffed operating hours (6:00 AM – 10:00 PM daily).
+            </div>
+          </div>
+
+          <!-- Accordion 3 -->
+          <div class="faq-card glass-card rounded-2xl border border-white/10 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none">
+              <span class="font-heading font-bold text-base sm:text-lg text-white">What is your cancellation and freeze policy?</span>
+              <i class="fa-solid fa-chevron-down text-crimson-500 transform transition-transform duration-300"></i>
+            </button>
+            <div class="faq-content hidden px-6 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+              We despise predatory gym contracts. All month-to-month plans can be paused or cancelled at any time with a simple 14-day notice submitted via the mobile member portal or WhatsApp concierge. No hidden penalty fees.
+            </div>
+          </div>
+
+          <!-- Accordion 4 -->
+          <div class="faq-card glass-card rounded-2xl border border-white/10 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none">
+              <span class="font-heading font-bold text-base sm:text-lg text-white">Are the cold plunge and saunas included with membership?</span>
+              <i class="fa-solid fa-chevron-down text-crimson-500 transform transition-transform duration-300"></i>
+            </button>
+            <div class="faq-content hidden px-6 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+              Our Finnish dry sauna and eucalyptus steam rooms are included in all Pro and VIP tiers. The 42°F contrast cold plunge tubs are an exclusive amenity for our VIP Black members and can also be booked per session.
+            </div>
+          </div>
+
+          <!-- Accordion 5 -->
+          <div class="faq-card glass-card rounded-2xl border border-white/10 overflow-hidden">
+            <button onclick="toggleFaq(this)" class="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none">
+              <span class="font-heading font-bold text-base sm:text-lg text-white">Is chalk permitted in the weight room?</span>
+              <i class="fa-solid fa-chevron-down text-crimson-500 transform transition-transform duration-300"></i>
+            </button>
+            <div class="faq-content hidden px-6 pb-5 text-sm text-zinc-400 leading-relaxed border-t border-white/5 pt-3">
+              Absolutely. We provide communal chalk bowls throughout the Olympic platform and free weight sectors. We expect members to brush the knurling after heavy deadlift sessions using the provided brass brushes.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </section>
+
+    <!-- ───────────────────────────────────────────────────
+         2. MEMBERSHIP VIEW (#membership)
+    ──────────────────────────────────────────────────── -->
+    <section id="view-membership" class="page-view min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Membership Page Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-3">
+          <i class="fa-solid fa-shield-halved"></i> Tiered Access
+        </div>
+        <h1 class="font-heading font-black text-4xl sm:text-6xl text-white tracking-tight leading-tight uppercase">
+          OUR <span class="text-crimson-600 text-glow-crimson">MEMBERSHIPS</span>
+        </h1>
+        <p class="text-zinc-300 text-base sm:text-lg mt-4 max-w-2xl mx-auto">
+          Choose your level of commitment. Every plan provides uncompromising iron standards, zero maintenance upcharges, and transparent pricing.
+        </p>
+
+        <!-- Billing Period Toggle -->
+        <div class="inline-flex items-center p-1.5 rounded-full bg-deep-900 border border-white/10 mt-8 shadow-inner">
+          <button id="billing-monthly-btn" onclick="setBillingCycle('monthly')" class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all">Monthly Billing</button>
+          <button id="billing-annual-btn" onclick="setBillingCycle('annual')" class="px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center gap-2">
+            Annual Commitment <span class="bg-amber-400/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">SAVE 20%</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pricing Cards Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch max-w-7xl mx-auto mb-20">
+        
+        <!-- PLAN 1: SILVER ACCESS -->
+        <div class="p-8 rounded-3xl glass-card border border-white/10 flex flex-col justify-between relative group">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs uppercase tracking-widest text-zinc-400 font-bold">Standard Tier</span>
+              <i class="fa-solid fa-dumbbell text-zinc-500"></i>
+            </div>
+            <h3 class="font-heading font-black text-2xl text-white">SILVER IRON</h3>
+            <p class="text-xs text-zinc-400 mt-1">Essential iron access for independent lifters.</p>
+            
+            <div class="my-6 py-4 border-y border-white/10">
+              <div class="flex items-baseline gap-1">
+                <span class="text-zinc-400 text-lg font-bold">$</span>
+                <span id="price-silver" class="font-heading font-black text-5xl text-white">59</span>
+                <span class="text-zinc-400 text-sm">/ month</span>
+              </div>
+              <span id="billed-silver-note" class="text-[11px] text-zinc-500 block mt-1">Billed monthly • Cancel anytime</span>
+            </div>
+
+            <ul class="space-y-3.5 text-sm text-zinc-300">
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 text-xs"></i> Staffed Hours Gym Floor Access
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 text-xs"></i> Full Olympic & Powerlifting Zone
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 text-xs"></i> Standard Locker & Shower Access
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 text-xs"></i> Kronos Mobile Training Log App
+              </li>
+              <li class="flex items-center gap-3 text-zinc-500">
+                <i class="fa-solid fa-xmark text-xs"></i> 24/7 Biometric Night Access
+              </li>
+              <li class="flex items-center gap-3 text-zinc-500">
+                <i class="fa-solid fa-xmark text-xs"></i> Sauna & Cold Plunge Spa
+              </li>
+            </ul>
+          </div>
+
+          <button onclick="openMembershipModal('Silver Iron Tier')" class="mt-8 w-full py-3.5 rounded-xl border border-white/20 hover:border-crimson-500 text-white font-heading font-bold text-sm tracking-wider uppercase transition-all duration-300 hover:bg-white/5">
+            Select Silver
+          </button>
+        </div>
+
+        <!-- PLAN 2: CRIMSON PRO (POPULAR / GLOWING) -->
+        <div class="p-8 sm:p-9 rounded-3xl bg-deep-900/90 border-2 border-crimson-600 shadow-crimson-lg flex flex-col justify-between relative transform lg:-translate-y-4">
+          <!-- Floating Badge -->
+          <div class="absolute -top-3.5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-crimson-600 to-crimson-700 text-white text-[11px] font-heading font-extrabold uppercase tracking-widest px-4 py-1 rounded-full shadow-crimson-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-fire text-amber-300 text-xs"></i> MOST POPULAR CHOICE
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-4 mt-2">
+              <span class="text-xs uppercase tracking-widest text-crimson-400 font-bold">Athlete Tier</span>
+              <i class="fa-solid fa-shield-heart text-crimson-500"></i>
+            </div>
+            <h3 class="font-heading font-black text-3xl text-white">CRIMSON PRO</h3>
+            <p class="text-xs text-zinc-400 mt-1">Our flagship 24/7 all-zone training package.</p>
+            
+            <div class="my-6 py-4 border-y border-crimson-900/50">
+              <div class="flex items-baseline gap-1">
+                <span class="text-crimson-400 text-lg font-bold">$</span>
+                <span id="price-pro" class="font-heading font-black text-5xl text-white text-glow-crimson">99</span>
+                <span class="text-zinc-400 text-sm">/ month</span>
+              </div>
+              <span id="billed-pro-note" class="text-[11px] text-zinc-400 block mt-1">Billed monthly • Complete 24/7 keycard</span>
+            </div>
+
+            <ul class="space-y-3.5 text-sm text-zinc-200">
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> <strong>24/7/365 Biometric Keycard Access</strong>
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> Full Weight Floor & 50m Sprint Turf
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> Finnish Cedar Sauna & Steam Rooms
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> 2 Guest Day Passes Included Each Month
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> 1 Monthly InBody Biometric 3D Scan
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-crimson-500 font-bold"></i> 10% Discount on Pro Shop Supplements
+              </li>
+            </ul>
+          </div>
+
+          <button onclick="openMembershipModal('Crimson Pro Tier')" class="mt-8 w-full py-4 rounded-xl bg-gradient-to-r from-crimson-600 via-crimson-700 to-crimson-800 hover:from-crimson-500 hover:to-crimson-700 text-white font-heading font-extrabold text-sm tracking-wider uppercase shadow-crimson-md hover:shadow-crimson-lg transition-all duration-300">
+            JOIN CRIMSON PRO
+          </button>
+        </div>
+
+        <!-- PLAN 3: APEX VIP BLACK -->
+        <div class="p-8 rounded-3xl glass-card border border-white/10 flex flex-col justify-between relative group">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <span class="text-xs uppercase tracking-widest text-amber-400 font-bold">Executive Tier</span>
+              <i class="fa-solid fa-crown text-amber-400"></i>
+            </div>
+            <h3 class="font-heading font-black text-2xl text-white">APEX VIP BLACK</h3>
+            <p class="text-xs text-zinc-400 mt-1">Unrestricted concierge luxury & recovery.</p>
+            
+            <div class="my-6 py-4 border-y border-white/10">
+              <div class="flex items-baseline gap-1">
+                <span class="text-amber-400 text-lg font-bold">$</span>
+                <span id="price-vip" class="font-heading font-black text-5xl text-white">179</span>
+                <span class="text-zinc-400 text-sm">/ month</span>
+              </div>
+              <span id="billed-vip-note" class="text-[11px] text-zinc-500 block mt-1">Billed monthly • All-inclusive</span>
+            </div>
+
+            <ul class="space-y-3.5 text-sm text-zinc-300">
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> <strong>Everything in Crimson Pro</strong>
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> Unlimited 42°F Contrast Cold Plunge Tubs
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> Dedicated Private Locker & Towel Service
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> 2 Monthly 1-on-1 Master Coaching Sessions
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> Unlimited Guest Passes (Staffed hours)
+              </li>
+              <li class="flex items-center gap-3">
+                <i class="fa-solid fa-check text-amber-400 text-xs"></i> $50 Monthly Pro Shop Credit Included
+              </li>
+            </ul>
+          </div>
+
+          <button onclick="openMembershipModal('Apex VIP Black Tier')" class="mt-8 w-full py-3.5 rounded-xl border border-amber-500/40 hover:border-amber-400 text-amber-300 font-heading font-bold text-sm tracking-wider uppercase transition-all duration-300 hover:bg-amber-950/20">
+            CLAIM VIP BLACK
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Comparison Perks Banner -->
+      <div class="p-8 rounded-3xl glass-panel border border-white/10 max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div class="p-4">
+            <i class="fa-solid fa-handshake-simple text-2xl text-crimson-500 mb-2"></i>
+            <h4 class="font-heading font-bold text-white text-base">No Long-Term Contracts</h4>
+            <p class="text-xs text-zinc-400 mt-1">Freedom to pause or cancel with transparent, straightforward terms.</p>
+          </div>
+          <div class="p-4 border-y md:border-y-0 md:border-x border-white/10">
+            <i class="fa-solid fa-fingerprint text-2xl text-crimson-500 mb-2"></i>
+            <h4 class="font-heading font-bold text-white text-base">Zero Initiation Tricks</h4>
+            <p class="text-xs text-zinc-400 mt-1">No bogus 'annual maintenance fees' hidden in your invoice.</p>
+          </div>
+          <div class="p-4">
+            <i class="fa-brands fa-whatsapp text-2xl text-emerald-400 mb-2"></i>
+            <h4 class="font-heading font-bold text-white text-base">Direct Concierge</h4>
+            <p class="text-xs text-zinc-400 mt-1">Instant assistance from real gym managers via dedicated WhatsApp line.</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ───────────────────────────────────────────────────
+         3. SHOP VIEW (#shop)
+    ──────────────────────────────────────────────────── -->
+    <section id="view-shop" class="page-view min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Shop Page Header -->
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-3">
+          <i class="fa-solid fa-flask-vial"></i> Apex Labs & Gear
+        </div>
+        <h1 class="font-heading font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+          PRO SHOP & <span class="text-crimson-600 text-glow-crimson">SUPPLEMENTS</span>
+        </h1>
+        <p class="text-zinc-300 text-base sm:text-lg mt-3">
+          Lab-tested sports nutrition, oversized streetwear apparel, and competition-rated lifting hardware.
+        </p>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mt-8">
+          <button onclick="filterShop('all')" class="shop-filter-btn active px-5 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all">All Items</button>
+          <button onclick="filterShop('supplements')" class="shop-filter-btn px-5 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Supplements</button>
+          <button onclick="filterShop('apparel')" class="shop-filter-btn px-5 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Apparel</button>
+          <button onclick="filterShop('gear')" class="shop-filter-btn px-5 py-2 rounded-full text-xs font-heading font-bold uppercase tracking-wider bg-deep-850 hover:bg-white/10 text-zinc-300 transition-all">Heavy Gear</button>
+        </div>
+      </div>
+
+      <!-- Products Catalog Grid -->
+      <div id="shop-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        
+        <!-- PRODUCT 1 -->
+        <div class="shop-card supplements rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=600&q=80" alt="Kronos Iso-Hydro Whey" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-crimson-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Bestseller</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Nutrition</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Iso-Hydro 100% Pure Whey 2kg</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Ultra-filtered isolate, 27g protein per scoop with added digestive enzymes and zero sugar.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$69.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Iso-Hydro 100% Pure Whey 2kg', 69.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(1, 'Iso-Hydro 100% Pure Whey 2kg', 69.99, 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 2 -->
+        <div class="shop-card supplements rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=600&q=80" alt="Vulcan Pre-Workout" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-zinc-800 text-zinc-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">High Stim</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Energy & Pumps</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Vulcan Pre-Workout 400g</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">6g L-Citrulline Malate, 3.2g Beta-Alanine, and 350mg caffeine anhydrous for ruthless training sessions.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$44.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Vulcan Pre-Workout 400g', 44.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(2, 'Vulcan Pre-Workout 400g', 44.99, 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 3 -->
+        <div class="shop-card apparel rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=600&q=80" alt="Oversized Pump Cover Hoodie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-crimson-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Heavy 480GSM</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Apparel</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Apex Heavyweight Pump Hoodie</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Vintage washed deep obsidian fabric, crimson embroidered chest insignia, drop shoulder cut.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$58.00</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Apex Heavyweight Pump Hoodie', 58.00)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(3, 'Apex Heavyweight Pump Hoodie', 58.00, 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 4 -->
+        <div class="shop-card gear rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80" alt="10mm Lever Belt" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-zinc-800 text-zinc-200 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">IPF Spec</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Competition Gear</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Competition 10mm Lever Belt</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Full-grain vegetable tanned bridle leather with zinc alloy quick-release lever clasp.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$89.00</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Competition 10mm Lever Belt', 89.00)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(4, 'Competition 10mm Lever Belt', 89.00, 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 5 -->
+        <div class="shop-card gear rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80" alt="Matte Obsidian Shaker" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Accessories</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Obsidian Steel Shaker 750ml</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Double-wall vacuum insulated stainless steel. Keeps intra-workout drinks freezing for 24 hours.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$24.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Obsidian Steel Shaker 750ml', 24.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(5, 'Obsidian Steel Shaker 750ml', 24.99, 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 6 -->
+        <div class="shop-card gear rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80" alt="Tactical Gym Duffel" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Gear Storage</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Tactical Duffel 45L Water-Resistant</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Isolated shoe ventilation compartment, belt strap anchor loops, and heavy Cordura nylon build.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$64.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Tactical Duffel 45L', 64.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(6, 'Tactical Duffel 45L', 64.99, 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 7 -->
+        <div class="shop-card gear rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=600&q=80" alt="Deadlift Straps" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Grip Support</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Heavy Duty Figure-8 Deadlift Straps</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">Rated for 1,000+ lbs loads. Dual cross-stitched heavy cotton webbing with padded wrist guards.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$19.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Figure-8 Deadlift Straps', 19.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(7, 'Figure-8 Deadlift Straps', 19.99, 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCT 8 -->
+        <div class="shop-card supplements rounded-2xl glass-card border border-white/10 overflow-hidden flex flex-col justify-between group">
+          <div class="relative h-60 bg-deep-900 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80" alt="Creapure Creatine" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <span class="absolute top-3 left-3 bg-crimson-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Creapure®</span>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="text-[11px] uppercase tracking-wider text-crimson-400 font-semibold mb-1">Cellular ATP</div>
+              <h3 class="font-heading font-bold text-white text-base leading-snug">Micronized Creatine Monohydrate 500g</h3>
+              <p class="text-xs text-zinc-400 mt-1 line-clamp-2">German Creapure source, 99.9% pure pharmaceutical grade for maximum muscular power output.</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+              <span class="font-heading font-black text-xl text-white">$34.99</span>
+              <div class="flex gap-1.5">
+                <button onclick="orderProductWhatsApp('Micronized Creatine 500g', 34.99)" class="p-2 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/30 text-emerald-400 text-xs" title="Order via WhatsApp">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </button>
+                <button onclick="addToCart(8, 'Micronized Creatine 500g', 34.99, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=300&q=80')" class="px-3 py-1.5 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase flex items-center gap-1.5 transition-colors">
+                  <i class="fa-solid fa-plus text-[10px]"></i> Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick Delivery & Locker Pickup Info -->
+      <div class="p-6 rounded-2xl glass-panel border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 max-w-4xl mx-auto">
+        <div class="flex items-center gap-4 text-center sm:text-left">
+          <div class="w-12 h-12 rounded-xl bg-crimson-600/20 text-crimson-500 flex items-center justify-center text-xl flex-shrink-0">
+            <i class="fa-solid fa-box-open"></i>
+          </div>
+          <div>
+            <h4 class="font-heading font-bold text-white text-base">Same-Day Member Locker Drop-Off</h4>
+            <p class="text-xs text-zinc-400">Order by 2:00 PM and your items will be waiting secured in your gym locker by your evening workout.</p>
+          </div>
+        </div>
+        <button onclick="toggleCartDrawer(true)" class="px-6 py-2.5 rounded-xl bg-deep-800 hover:bg-deep-750 border border-white/10 text-white font-heading font-semibold text-xs tracking-wider uppercase flex-shrink-0">
+          Open Cart
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ───────────────────────────────────────────────────
+         4. FACILITIES VIEW (#facilities)
+    ──────────────────────────────────────────────────── -->
+    <section id="view-facilities" class="page-view min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Facilities Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-3">
+          <i class="fa-solid fa-cubes-stacked"></i> State of the Art
+        </div>
+        <h1 class="font-heading font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+          OUR GYM <span class="text-crimson-600 text-glow-crimson">FACILITIES</span>
+        </h1>
+        <p class="text-zinc-300 text-base sm:text-lg mt-3">
+          Engineered for high-output human mechanics. 18,500 square feet divided into 6 distinct training and recovery zones.
+        </p>
+      </div>
+
+      <!-- Facilities Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+        
+        <!-- Facility 1 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80" alt="Free Weights Area" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-weight-hanging"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">The Heavy Iron Sector</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Featuring calibrated steel plates, laser-cut monolifts, deadlift platforms with vibration dampening oak, and dumbbells ranging from 5 lbs up to 150 lbs.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Eleiko Competition Barbells</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> 8 Dedicated Squat Cages</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility 2 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=700&q=80" alt="Cardio Deck" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">Biometric Cardio Arena</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Woodway curved manual treadmills, StairMaster 10-series, Concept2 RowErgs and SkiErgs equipped with telemetry sync for heart-rate training zones.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Non-motorized curve slats</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Apple GymKit & ANT+ Sync</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility 3 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?auto=format&fit=crop&w=700&q=80" alt="Crossfit Turf" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">50M Sprint Turf & Rig</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Professional-grade artificial turf sprint lane accompanied by heavy sleds, battle ropes, high plyo boxes, and an all-steel modular gymnastics rig.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Weighted Prowler Sleds</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> 15ft Natural Climbing Ropes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility 4 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=700&q=80" alt="Spa & Sauna" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-hot-tub-person"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">Infrared Sauna & Cold Plunge</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Advanced contrast therapy wing featuring full-spectrum cedar saunas (up to 195°F) and dedicated 42°F continuously filtered cold immersion plunge tanks.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Ozone Filtered Chilled Water</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Eucalyptus Infused Steam</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility 5 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1549476464-37392f717541?auto=format&fit=crop&w=700&q=80" alt="Combat & Boxing Cage" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-hand-fist"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">Combat & Striking Octagon</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Full-gauge MMA caged enclosure, teardrop leather heavy bags, Fairtex banana bags, and slip-resistant tatami mats for striking and conditioning drills.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> 150 lb Heavy Leather Bags</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Regulation Caged Training Ring</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Facility 6 -->
+        <div class="rounded-3xl glass-card border border-white/10 overflow-hidden flex flex-col group">
+          <div class="h-56 relative overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=700&q=80" alt="Private Coaching Suite" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-deep-950 via-deep-950/30 to-transparent"></div>
+            <div class="absolute top-4 left-4 w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-user-ninja"></i>
+            </div>
+          </div>
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-heading font-black text-xl text-white">Private Coaching & Biometrics</h3>
+              <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                Exclusive studio suite containing InBody 770 multi-frequency body composition scanners, high-speed biomechanics cameras, and soft tissue therapy tables.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-white/5 space-y-1.5 text-xs text-zinc-300">
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> Segmental Lean Mass Tracking</div>
+              <div class="flex items-center gap-2"><i class="fa-solid fa-check text-crimson-500 text-[10px]"></i> 1-on-1 Certified Master Coaches</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Facility Booking Banner -->
+      <div class="p-8 sm:p-12 rounded-3xl glass-panel border border-crimson-600/40 relative overflow-hidden shadow-crimson-md text-center max-w-4xl mx-auto">
+        <h3 class="font-heading font-black text-2xl sm:text-3xl text-white uppercase">Experience The Sanctuary In Person</h3>
+        <p class="text-zinc-300 text-sm sm:text-base max-w-xl mx-auto mt-2">Book a 30-minute private walkthrough guided by one of our head athletic directors.</p>
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-6">
+          <button onclick="openMembershipModal('Private VIP Tour')" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white font-heading font-bold text-xs uppercase tracking-wider shadow-crimson-sm transition-all">
+            Schedule Private Tour
+          </button>
+          <a href="#contact" class="px-8 py-3.5 rounded-xl border border-white/20 hover:border-white text-white font-heading font-semibold text-xs uppercase tracking-wider transition-colors">
+            Get Directions
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ───────────────────────────────────────────────────
+         5. CONTACT US & LOCATION VIEW (#contact)
+    ──────────────────────────────────────────────────── -->
+    <section id="view-contact" class="page-view min-h-screen py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      
+      <!-- Contact Header -->
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 text-crimson-500 font-heading font-bold text-xs uppercase tracking-[0.3em] mb-3">
+          <i class="fa-solid fa-paper-plane"></i> Reach The Forge
+        </div>
+        <h1 class="font-heading font-black text-4xl sm:text-6xl text-white tracking-tight uppercase">
+          GET IN <span class="text-crimson-600 text-glow-crimson">TOUCH</span>
+        </h1>
+        <p class="text-zinc-300 text-base sm:text-lg mt-3">
+          Visit the physical sanctuary, speak with our athletic concierge, or send us a direct message.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 max-w-6xl mx-auto mb-16">
+        
+        <!-- Left Column: Operating Hours, Location Details, WhatsApp -->
+        <div class="lg:col-span-5 space-y-6">
+          
+          <!-- Hours Card -->
+          <div class="p-6 rounded-3xl glass-card border border-white/10">
+            <h3 class="font-heading font-black text-lg text-white flex items-center gap-2.5 mb-4">
+              <i class="fa-solid fa-clock text-crimson-500"></i> Operating Hours
+            </h3>
+            
+            <div class="space-y-2.5 text-xs sm:text-sm">
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-zinc-400">Monday – Thursday</span>
+                <span class="font-semibold text-white">5:00 AM – 11:00 PM</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-zinc-400">Friday</span>
+                <span class="font-semibold text-white">5:00 AM – 10:00 PM</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-zinc-400">Saturday</span>
+                <span class="font-semibold text-white">7:00 AM – 9:00 PM</span>
+              </div>
+              <div class="flex justify-between py-2 border-b border-white/5">
+                <span class="text-zinc-400">Sunday</span>
+                <span class="font-semibold text-white">8:00 AM – 8:00 PM</span>
+              </div>
+              <div class="p-3 rounded-xl bg-crimson-950/60 border border-crimson-600/30 flex items-center gap-3 mt-3">
+                <i class="fa-solid fa-key text-crimson-400 text-lg"></i>
+                <div class="text-[11px] text-zinc-300">
+                  <strong class="text-white">Pro & VIP Members:</strong> 24/7/365 unrestricted biometric keycard entry.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Physical Location & Contact Info -->
+          <div class="p-6 rounded-3xl glass-card border border-white/10 space-y-4">
+            <h3 class="font-heading font-black text-lg text-white flex items-center gap-2.5">
+              <i class="fa-solid fa-location-dot text-crimson-500"></i> Sanctuary Headquarters
+            </h3>
+
+            <div class="space-y-3 text-xs sm:text-sm">
+              <div class="flex items-start gap-3">
+                <i class="fa-solid fa-building text-zinc-500 mt-1"></i>
+                <div>
+                  <div class="text-white font-semibold">Kronos Apex Flagship</div>
+                  <div class="text-zinc-400 text-xs">1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-phone text-zinc-500"></i>
+                <a href="tel:4805550198" class="text-zinc-300 hover:text-crimson-400 transition-colors font-medium">
+                  +1 (480) 555-0198
+                </a>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <i class="fa-solid fa-envelope text-zinc-500"></i>
+                <a href="mailto:concierge@kronosapex.com" class="text-zinc-300 hover:text-crimson-400 transition-colors font-medium">
+                  concierge@kronosapex.com
+                </a>
+              </div>
+            </div>
+
+            <!-- Direct Action Triggers -->
+            <div class="pt-2 grid grid-cols-2 gap-3">
+              <a href="https://wa.me/14805550198?text=Hello%20Kronos%20Apex!%20I'd%20like%20to%20connect%20with%20your%20coaching%20team." target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-heading font-bold text-center flex items-center justify-center gap-1.5 transition-colors">
+                <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp
+              </a>
+              <a href="https://maps.google.com/?q=1126+S+Gilbert+Rd+Mesa+AZ+85204" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-deep-850 hover:bg-white/10 border border-white/10 text-white text-xs font-heading font-bold text-center flex items-center justify-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-map-location-dot text-sm text-crimson-500"></i> Open Maps
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Interactive Contact Form -->
+        <div class="lg:col-span-7">
+          <div class="p-8 rounded-3xl glass-panel border border-white/15 shadow-2xl relative">
+            <h3 class="font-heading font-black text-2xl text-white mb-2">SEND US A MESSAGE</h3>
+            <p class="text-zinc-400 text-xs sm:text-sm mb-6">Our coaching concierge responds within 30 minutes during staffed hours.</p>
+
+            <form id="contact-form" onsubmit="handleContactSubmit(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">Full Name *</label>
+                  <input type="text" id="contact-name" required placeholder="Marcus Phoenix" class="w-full px-4 py-3 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-crimson-500 focus:ring-1 focus:ring-crimson-500 text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">Email Address *</label>
+                  <input type="email" id="contact-email" required placeholder="marcus@example.com" class="w-full px-4 py-3 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-crimson-500 focus:ring-1 focus:ring-crimson-500 text-sm">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">Phone Number</label>
+                  <input type="tel" id="contact-phone" placeholder="(480) 000-0000" class="w-full px-4 py-3 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-crimson-500 focus:ring-1 focus:ring-crimson-500 text-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">Primary Interest</label>
+                  <select id="contact-interest" class="w-full px-4 py-3 rounded-xl bg-deep-900 border border-white/10 text-white focus:outline-none focus:border-crimson-500 focus:ring-1 focus:ring-crimson-500 text-sm">
+                    <option value="3-Day VIP Pass">Claim 3-Day VIP Pass</option>
+                    <option value="Pro Membership">Crimson Pro Membership</option>
+                    <option value="Personal Coaching">1-on-1 Master Coaching</option>
+                    <option value="Pro Shop Inquiry">Pro Shop & Supplements</option>
+                    <option value="Private Tour">Schedule Private Tour</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5">Your Message or Training Goals *</label>
+                <textarea id="contact-message" required rows="4" placeholder="Tell us about your fitness history, upcoming competitions, or questions..." class="w-full px-4 py-3 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 focus:outline-none focus:border-crimson-500 focus:ring-1 focus:ring-crimson-500 text-sm resize-none"></textarea>
+              </div>
+
+              <button type="submit" id="contact-submit-btn" class="w-full py-4 rounded-xl bg-gradient-to-r from-crimson-600 via-crimson-700 to-crimson-800 hover:from-crimson-500 hover:to-crimson-700 text-white font-heading font-extrabold text-sm uppercase tracking-wider shadow-crimson-md hover:shadow-crimson-lg transition-all duration-300 flex items-center justify-center gap-2">
+                <span>SEND MESSAGE TO CONCIERGE</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </form>
+
+            <!-- Success Alert (Hidden Initially) -->
+            <div id="contact-success" class="hidden mt-4 p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs text-center">
+              <i class="fa-solid fa-circle-check text-base mb-1 block"></i>
+              Your inquiry has been logged! Our team will reach out via email/phone promptly.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════
+       GLOBAL FOOTER
+  ════════════════════════════════════════════════════════ -->
+  <footer class="relative z-10 border-t border-white/10 bg-deep-950/90 backdrop-blur-xl pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/5">
+        
+        <!-- Brand Summary -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-crimson-600 flex items-center justify-center text-white shadow-crimson-sm">
+              <i class="fa-solid fa-dumbbell text-lg transform -rotate-45"></i>
+            </div>
+            <span class="font-heading font-black tracking-wider text-2xl text-white">
+              KRONOS <span class="text-crimson-500">APEX</span>
+            </span>
+          </div>
+          <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-sm">
+            The premier high-performance fitness sanctuary. Combining calibrated Olympic iron, biomechanical machinery, and contrast recovery for uncompromising physical results.
+          </p>
+          <div class="flex items-center gap-3 pt-2">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-deep-900 border border-white/10 text-zinc-400 hover:text-white hover:border-crimson-500 flex items-center justify-center transition-colors" aria-label="Instagram">
+              <i class="fa-brands fa-instagram text-sm"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-deep-900 border border-white/10 text-zinc-400 hover:text-white hover:border-crimson-500 flex items-center justify-center transition-colors" aria-label="YouTube">
+              <i class="fa-brands fa-youtube text-sm"></i>
+            </a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-deep-900 border border-white/10 text-zinc-400 hover:text-white hover:border-crimson-500 flex items-center justify-center transition-colors" aria-label="TikTok">
+              <i class="fa-brands fa-tiktok text-sm"></i>
+            </a>
+            <a href="https://wa.me/14805550198" target="_blank" rel="noopener noreferrer" class="w-9 h-9 rounded-lg bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 hover:text-emerald-300 flex items-center justify-center transition-colors" aria-label="WhatsApp">
+              <i class="fa-brands fa-whatsapp text-sm"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="space-y-3">
+          <h4 class="font-heading font-bold text-white text-sm uppercase tracking-wider">Navigation</h4>
+          <ul class="space-y-2 text-xs text-zinc-400">
+            <li><a href="#home" class="hover:text-crimson-400 transition-colors">Home Portal</a></li>
+            <li><a href="#membership" class="hover:text-crimson-400 transition-colors">Membership Tiers</a></li>
+            <li><a href="#shop" class="hover:text-crimson-400 transition-colors">Pro Shop & Gear</a></li>
+            <li><a href="#facilities" class="hover:text-crimson-400 transition-colors">Gym Facilities</a></li>
+            <li><a href="#contact" class="hover:text-crimson-400 transition-colors">Contact & Hours</a></li>
+          </ul>
+        </div>
+
+        <!-- Sanctuary Amenities -->
+        <div class="space-y-3">
+          <h4 class="font-heading font-bold text-white text-sm uppercase tracking-wider">Sanctuary</h4>
+          <ul class="space-y-2 text-xs text-zinc-400">
+            <li><span class="text-zinc-300">Olympic Lifting Platforms</span></li>
+            <li><span class="text-zinc-300">50-Meter Sprint Turf</span></li>
+            <li><span class="text-zinc-300">42°F Contrast Cold Plunge</span></li>
+            <li><span class="text-zinc-300">InBody 770 Biometric Scan</span></li>
+            <li><span class="text-zinc-300">24/7 Encrypted Keycard</span></li>
+          </ul>
+        </div>
+
+        <!-- Newsletter Subscription -->
+        <div class="space-y-3">
+          <h4 class="font-heading font-bold text-white text-sm uppercase tracking-wider">The Kronos Wire</h4>
+          <p class="text-xs text-zinc-400">Receive scientifically verified training cycles and private pro-shop drops.</p>
+          <form onsubmit="handleNewsletter(event)" class="space-y-2">
+            <input type="email" required placeholder="Enter your email" class="w-full px-3 py-2 rounded-xl bg-deep-900 border border-white/10 text-white text-xs placeholder-zinc-500 focus:outline-none focus:border-crimson-500">
+            <button type="submit" class="w-full py-2 rounded-xl bg-crimson-600 hover:bg-crimson-500 text-white font-heading font-bold text-xs uppercase tracking-wider transition-colors">
+              Subscribe
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+      <!-- Copyright Notice -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4">
+        <div>
+          © 2026 KRONOS APEX FITNESS SANCTUARY. All Rights Reserved.
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="#contact" class="hover:text-zinc-400">Privacy Policy</a>
+          <a href="#contact" class="hover:text-zinc-400">Terms of Service</a>
+          <a href="#contact" class="hover:text-zinc-400">Security Clearance</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════
+       INTERACTIVE CART SLIDE-OVER DRAWER
+  ════════════════════════════════════════════════════════ -->
+  <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden transition-opacity duration-300" onclick="toggleCartDrawer(false)"></div>
+  <div id="cart-drawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-96 bg-deep-900/98 backdrop-blur-2xl border-l border-white/10 z-50 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-white/10 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-cart-shopping text-crimson-500 text-lg"></i>
+        <h3 class="font-heading font-bold text-lg text-white">Your Pro Cart</h3>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="w-8 h-8 rounded-lg bg-deep-800 text-zinc-400 hover:text-white flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Items List -->
+    <div id="cart-items-container" class="p-5 flex-1 overflow-y-auto space-y-4">
+      <!-- Dynamic cart items rendered here -->
+      <div id="cart-empty-message" class="text-center py-16 text-zinc-500">
+        <i class="fa-solid fa-cart-plus text-4xl mb-3 text-zinc-600 block"></i>
+        <p class="text-sm">Your shopping cart is currently empty.</p>
+        <a href="#shop" onclick="toggleCartDrawer(false)" class="inline-block mt-4 text-xs font-heading font-bold text-crimson-400 hover:underline uppercase">Browse Pro Shop</a>
+      </div>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-5 border-t border-white/10 bg-deep-950/70 space-y-3">
+      <div class="flex justify-between items-center text-sm">
+        <span class="text-zinc-400">Subtotal</span>
+        <span id="cart-subtotal" class="font-heading font-black text-xl text-white">$0.00</span>
+      </div>
+      <p class="text-[11px] text-zinc-500">Pickup in gym locker or ship to your address.</p>
+      
+      <button id="cart-whatsapp-checkout" onclick="checkoutCartWhatsApp()" disabled class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-heading font-extrabold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all">
+        <i class="fa-brands fa-whatsapp text-base"></i> Checkout via WhatsApp
+      </button>
+
+      <button onclick="clearCart()" class="w-full py-2 text-[11px] text-zinc-500 hover:text-zinc-300 text-center block transition-colors">
+        Clear Cart Items
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       INTERACTIVE LIGHTBOX MODAL (GALLERY)
+  ════════════════════════════════════════════════════════ -->
+  <div id="lightbox-modal" class="fixed inset-0 z-50 hidden bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+    <button onclick="closeLightbox()" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-deep-850 hover:bg-crimson-600 text-white flex items-center justify-center text-lg z-10 transition-colors" aria-label="Close Lightbox">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="max-w-4xl w-full max-h-[90vh] flex flex-col items-center">
+      <img id="lightbox-img" src="" alt="High Res Preview" class="max-h-[75vh] w-auto object-contain rounded-2xl border border-white/10 shadow-2xl">
+      <div class="mt-4 text-center">
+        <h4 id="lightbox-title" class="font-heading font-bold text-xl text-white"></h4>
+        <p id="lightbox-desc" class="text-xs text-zinc-400 mt-1 max-w-lg mx-auto"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       MEMBERSHIP / VIP PASS MODAL
+  ════════════════════════════════════════════════════════ -->
+  <div id="membership-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-md w-full rounded-3xl glass-panel border border-white/20 p-6 sm:p-8 relative shadow-2xl overflow-hidden">
+      <button onclick="closeMembershipModal()" class="absolute top-5 right-5 text-zinc-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-xl bg-crimson-600 mx-auto flex items-center justify-center text-white text-xl shadow-crimson-sm mb-3">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <h3 id="modal-plan-title" class="font-heading font-black text-2xl text-white">CLAIM VIP ACCESS</h3>
+        <p class="text-xs text-zinc-400 mt-1">Instant clearance code delivered via SMS & WhatsApp.</p>
+      </div>
+
+      <form onsubmit="handleMembershipSignup(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 uppercase mb-1">Full Legal Name</label>
+          <input type="text" id="modal-name" required placeholder="Alex Mercer" class="w-full px-4 py-2.5 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-crimson-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 uppercase mb-1">Email Address</label>
+          <input type="email" id="modal-email" required placeholder="alex@mercer.com" class="w-full px-4 py-2.5 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-crimson-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 uppercase mb-1">WhatsApp / Phone Number</label>
+          <input type="tel" id="modal-phone" required placeholder="+1 (480) 555-0198" class="w-full px-4 py-2.5 rounded-xl bg-deep-900 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-crimson-500">
+        </div>
+
+        <button type="submit" class="w-full mt-4 py-3.5 rounded-xl bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white font-heading font-black text-xs uppercase tracking-wider shadow-crimson-md transition-all">
+          CONFIRM ACCESS CLEARANCE
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TOAST NOTIFICATION COMPONENT
+  ════════════════════════════════════════════════════════ -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 max-w-sm p-4 rounded-2xl glass-panel border border-crimson-600/40 text-white flex items-center gap-3 shadow-crimson-md pointer-events-none">
+    <div id="toast-icon" class="w-9 h-9 rounded-xl bg-crimson-600 flex items-center justify-center text-white flex-shrink-0 text-sm">
+      <i class="fa-solid fa-check"></i>
+    </div>
+    <div>
+      <h5 id="toast-title" class="font-heading font-bold text-xs uppercase tracking-wider text-white">Notification</h5>
+      <p id="toast-msg" class="text-xs text-zinc-300">Action completed successfully.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       VANILLA JAVASCRIPT: LOGIC & 3D GRAPHICS
+  ════════════════════════════════════════════════════════ -->
+  <script>
+    /* ─────────────────────────────────────────────────────────────
+       1. ROUTING SYSTEM (URL HASH-BASED MULTI-VIEW)
+    ────────────────────────────────────────────────────────────── */
+    const VALID_VIEWS = ['home', 'membership', 'shop', 'facilities', 'contact'];
+
+    function switchView(targetHash) {
+      // Clean hash parameter
+      let viewName = (targetHash || window.location.hash || '#home').replace('#', '').toLowerCase();
+      if (!VALID_VIEWS.includes(viewName)) {
+        viewName = 'home';
+      }
+
+      // Hide all views and reveal active view
+      VALID_VIEWS.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (viewEl) {
+          if (v === viewName) {
+            viewEl.classList.remove('hidden');
+            setTimeout(() => {
+              viewEl.classList.add('active-view');
+            }, 10);
+          } else {
+            viewEl.classList.remove('active-view');
+            setTimeout(() => {
+              viewEl.classList.add('hidden');
+            }, 300);
+          }
+        }
+      });
+
+      // Update Navigation Link States
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const linkTarget = link.getAttribute('data-nav');
+        if (linkTarget === viewName) {
+          link.classList.add('bg-crimson-600', 'text-white', 'shadow-crimson-sm');
+          link.classList.remove('text-zinc-300', 'hover:bg-white/5');
+        } else {
+          link.classList.remove('bg-crimson-600', 'text-white', 'shadow-crimson-sm');
+          link.classList.add('text-zinc-300', 'hover:bg-white/5');
+        }
+      });
+
+      // Update Document Title Dynamically
+      const titles = {
+        home: 'KRONOS APEX | Luxury 3D Fitness Sanctuary',
+        membership: 'KRONOS APEX | Membership Plans & VIP Tiers',
+        shop: 'KRONOS APEX | Pro Shop & Lab Supplements',
+        facilities: 'KRONOS APEX | Arena Facilities & Equipment',
+        contact: 'KRONOS APEX | Get in Touch & 24/7 Hours'
+      };
+      document.title = titles[viewName] || titles.home;
+
+      // Scroll to Top Smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Listen to hash changes and initial page load
+    window.addEventListener('hashchange', () => switchView(window.location.hash));
+    window.addEventListener('DOMContentLoaded', () => {
+      switchView(window.location.hash || '#home');
+      calculateBMI();
+    });
+
+    /* ─────────────────────────────────────────────────────────────
+       2. THREE.JS INTERACTIVE 3D BACKGROUND CANVAS
+    ────────────────────────────────────────────────────────────── */
+    (function initThreeBackground() {
+      const canvas = document.getElementById('three-bg-canvas');
+      if (!canvas || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 30;
+
+      const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // 1. Futuristic Floating Wireframe Icosahedron & Torus
+      const geomIcosa = new THREE.IcosahedronGeometry(9, 1);
+      const matWireCrimson = new THREE.MeshBasicMaterial({
+        color: 0xdc2626,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.18
+      });
+      const meshIcosa = new THREE.Mesh(geomIcosa, matWireCrimson);
+      scene.add(meshIcosa);
+
+      const geomTorus = new THREE.TorusGeometry(14, 0.4, 16, 100);
+      const matTorus = new THREE.MeshBasicMaterial({
+        color: 0x991b1b,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.12
+      });
+      const meshTorus = new THREE.Mesh(geomTorus, matTorus);
+      scene.add(meshTorus);
+
+      // 2. High-Tech Dynamic Crimson Particle Galaxy
+      const particleCount = 750;
+      const geomParticles = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 80;
+        positions[i + 1] = (Math.random() - 0.5) * 80;
+        positions[i + 2] = (Math.random() - 0.5) * 60;
+
+        // Crimson and Charcoal Particle Colors
+        if (Math.random() > 0.4) {
+          colors[i] = 0.86; colors[i + 1] = 0.15; colors[i + 2] = 0.15; // Crimson red
+        } else {
+          colors[i] = 0.4; colors[i + 1] = 0.4; colors[i + 2] = 0.45; // Subtle silver
+        }
+      }
+
+      geomParticles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geomParticles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const matParticles = new THREE.PointsMaterial({
+        size: 0.8,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.65
+      });
+      const particleSystem = new THREE.Points(geomParticles, matParticles);
+      scene.add(particleSystem);
+
+      // Mouse Parallax Interaction
+      let mouseX = 0;
+      let mouseY = 0;
+      let targetX = 0;
+      let targetY = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+        mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+      });
+
+      // Render Loop
+      let clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const elapsedTime = clock.getElapsedTime();
+
+        targetX += (mouseX - targetX) * 0.05;
+        targetY += (mouseY - targetY) * 0.05;
+
+        meshIcosa.rotation.x = elapsedTime * 0.08 + targetY * 2;
+        meshIcosa.rotation.y = elapsedTime * 0.12 + targetX * 2;
+
+        meshTorus.rotation.x = elapsedTime * -0.05;
+        meshTorus.rotation.y = elapsedTime * 0.07;
+
+        particleSystem.rotation.y = elapsedTime * 0.02 + targetX * 0.8;
+        particleSystem.rotation.x = targetY * 0.8;
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Window Resize Responsiveness
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    })();
+
+    /* ─────────────────────────────────────────────────────────────
+       3. INTERACTIVE BMI CALCULATOR
+    ────────────────────────────────────────────────────────────── */
+    let currentBmiUnit = 'metric';
+
+    function setBmiUnit(unit) {
+      currentBmiUnit = unit;
+      const metricBtn = document.getElementById('bmi-unit-metric');
+      const imperialBtn = document.getElementById('bmi-unit-imperial');
+      const hSlider = document.getElementById('bmi-height-slider');
+      const wSlider = document.getElementById('bmi-weight-slider');
+      const hLabel = document.getElementById('bmi-height-label');
+      const wLabel = document.getElementById('bmi-weight-label');
+      const hMin = document.getElementById('bmi-height-min');
+      const hMax = document.getElementById('bmi-height-max');
+      const wMin = document.getElementById('bmi-weight-min');
+      const wMax = document.getElementById('bmi-weight-max');
+
+      if (unit === 'metric') {
+        metricBtn.className = 'px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all';
+        imperialBtn.className = 'px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all';
+        hLabel.innerText = 'Height (cm)';
+        wLabel.innerText = 'Weight (kg)';
+        hSlider.min = 120; hSlider.max = 230; hSlider.value = 178;
+        wSlider.min = 40; wSlider.max = 180; wSlider.value = 78;
+        hMin.innerText = '120 cm'; hMax.innerText = '230 cm';
+        wMin.innerText = '40 kg'; wMax.innerText = '180 kg';
+      } else {
+        imperialBtn.className = 'px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all';
+        metricBtn.className = 'px-5 py-2 rounded-lg text-xs font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all';
+        hLabel.innerText = 'Height (inches)';
+        wLabel.innerText = 'Weight (lbs)';
+        hSlider.min = 48; hSlider.max = 90; hSlider.value = 70;
+        wSlider.min = 90; wSlider.max = 400; wSlider.value = 172;
+        hMin.innerText = '48 in (4ft)'; hMax.innerText = '90 in (7.5ft)';
+        wMin.innerText = '90 lbs'; wMax.innerText = '400 lbs';
+      }
+      calculateBMI();
+    }
+
+    function calculateBMI() {
+      const hVal = parseFloat(document.getElementById('bmi-height-slider').value);
+      const wVal = parseFloat(document.getElementById('bmi-weight-slider').value);
+
+      document.getElementById('bmi-height-val').innerText = currentBmiUnit === 'metric' ? `${hVal} cm` : `${hVal} in`;
+      document.getElementById('bmi-weight-val').innerText = currentBmiUnit === 'metric' ? `${wVal} kg` : `${wVal} lbs`;
+
+      let bmi = 0;
+      if (currentBmiUnit === 'metric') {
+        const heightMeters = hVal / 100;
+        bmi = wVal / (heightMeters * heightMeters);
+      } else {
+        bmi = (wVal / (hVal * hVal)) * 703;
+      }
+
+      bmi = Math.round(bmi * 10) / 10;
+      document.getElementById('bmi-score').innerText = bmi.toFixed(1);
+
+      const catBadge = document.getElementById('bmi-category');
+      const adviceEl = document.getElementById('bmi-advice');
+      const indicator = document.getElementById('bmi-gauge-indicator');
+
+      let pct = Math.min(Math.max(((bmi - 15) / 25) * 100, 5), 95);
+      indicator.style.width = `${pct}%`;
+
+      if (bmi < 18.5) {
+        catBadge.className = 'inline-flex px-4 py-1 rounded-full text-xs font-heading font-bold tracking-wider uppercase bg-blue-950 text-blue-400 border border-blue-500/40 mb-4';
+        catBadge.innerText = 'Underweight';
+        adviceEl.innerText = 'Caloric surplus required with high protein intake (2g/kg) and heavy structural compound lifting.';
+      } else if (bmi >= 18.5 && bmi < 24.9) {
+        catBadge.className = 'inline-flex px-4 py-1 rounded-full text-xs font-heading font-bold tracking-wider uppercase bg-emerald-950 text-emerald-400 border border-emerald-500/40 mb-4';
+        catBadge.innerText = 'Normal / Athletic Range';
+        adviceEl.innerText = 'Optimal body composition. Maintain periodized hypertrophy, contrast therapy, and clean macronutrient distribution.';
+      } else if (bmi >= 25 && bmi < 29.9) {
+        catBadge.className = 'inline-flex px-4 py-1 rounded-full text-xs font-heading font-bold tracking-wider uppercase bg-amber-950 text-amber-400 border border-amber-500/40 mb-4';
+        catBadge.innerText = 'Overweight / High Muscle';
+        adviceEl.innerText = 'Assess body fat percentage with our InBody 770 scanner. If non-bodybuilder, initiate a 300 kcal deficit with sprint turf intervals.';
+      } else {
+        catBadge.className = 'inline-flex px-4 py-1 rounded-full text-xs font-heading font-bold tracking-wider uppercase bg-red-950 text-red-400 border border-red-500/40 mb-4';
+        catBadge.innerText = 'Obesity Category';
+        adviceEl.innerText = 'Prioritize low-impact joint conditioning on our Woodway curve decks and consult with our master nutrition coach.';
+      }
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       4. GALLERY FILTERING & LIGHTBOX
+    ────────────────────────────────────────────────────────────── */
+    function filterGallery(category) {
+      document.querySelectorAll('.gallery-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-crimson-600', 'text-white');
+        btn.classList.add('bg-deep-850', 'text-zinc-300');
+      });
+      event.target.classList.add('active', 'bg-crimson-600', 'text-white');
+      event.target.classList.remove('bg-deep-850', 'text-zinc-300');
+
+      const items = document.querySelectorAll('.gallery-item');
+      items.forEach(item => {
+        if (category === 'all' || item.classList.contains(category)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function openLightbox(imgSrc, title, desc) {
+      document.getElementById('lightbox-img').src = imgSrc;
+      document.getElementById('lightbox-title').innerText = title;
+      document.getElementById('lightbox-desc').innerText = desc;
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       5. SHOPPING CART & WHATSAPP ORDER INTEGRATION
+    ────────────────────────────────────────────────────────────── */
+    let cart = [];
+
+    function addToCart(id, name, price, img) {
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id, name, price, img, qty: 1 });
+      }
+      updateCartUI();
+      showToast('Added to Cart', `${name} is in your gear bag!`);
+    }
+
+    function updateCartQty(id, delta) {
+      const item = cart.find(item => item.id === id);
+      if (item) {
+        item.qty += delta;
+        if (item.qty <= 0) {
+          cart = cart.filter(i => i.id !== id);
+        }
+      }
+      updateCartUI();
+    }
+
+    function clearCart() {
+      cart = [];
+      updateCartUI();
+      showToast('Cart Cleared', 'All items removed.');
+    }
+
+    function updateCartUI() {
+      const container = document.getElementById('cart-items-container');
+      const counterBadge = document.getElementById('cart-counter-badge');
+      const mobileBadge = document.getElementById('mobile-cart-badge');
+      const subtotalEl = document.getElementById('cart-subtotal');
+      const checkoutBtn = document.getElementById('cart-whatsapp-checkout');
+
+      const totalItems = cart.reduce((acc, i) => acc + i.qty, 0);
+      const totalCost = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+
+      // Badge Counters
+      if (totalItems > 0) {
+        counterBadge.innerText = totalItems;
+        counterBadge.classList.remove('scale-0');
+        mobileBadge.innerText = totalItems;
+        mobileBadge.classList.remove('scale-0');
+      } else {
+        counterBadge.classList.add('scale-0');
+        mobileBadge.classList.add('scale-0');
+      }
+
+      subtotalEl.innerText = `$${totalCost.toFixed(2)}`;
+      checkoutBtn.disabled = cart.length === 0;
+
+      // Render Item rows
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-zinc-500">
+            <i class="fa-solid fa-cart-plus text-4xl mb-3 text-zinc-600 block"></i>
+            <p class="text-sm">Your shopping cart is currently empty.</p>
+            <a href="#shop" onclick="toggleCartDrawer(false)" class="inline-block mt-4 text-xs font-heading font-bold text-crimson-400 hover:underline uppercase">Browse Pro Shop</a>
+          </div>
+        `;
+      } else {
+        container.innerHTML = cart.map(item => `
+          <div class="p-3 rounded-xl bg-deep-850 border border-white/5 flex items-center justify-between gap-3">
+            <img src="${item.img}" alt="${item.name}" class="w-14 h-14 object-cover rounded-lg border border-white/10 flex-shrink-0">
+            <div class="flex-1 min-w-0">
+              <h5 class="text-xs font-heading font-bold text-white truncate">${item.name}</h5>
+              <div class="text-xs text-crimson-400 font-semibold">$${(item.price * item.qty).toFixed(2)}</div>
+              <div class="flex items-center gap-2 mt-1.5">
+                <button onclick="updateCartQty(${item.id}, -1)" class="w-5 h-5 rounded bg-deep-800 text-zinc-300 hover:text-white flex items-center justify-center text-xs">-</button>
+                <span class="text-xs font-bold text-white px-1">${item.qty}</span>
+                <button onclick="updateCartQty(${item.id}, 1)" class="w-5 h-5 rounded bg-deep-800 text-zinc-300 hover:text-white flex items-center justify-center text-xs">+</button>
+              </div>
+            </div>
+            <button onclick="updateCartQty(${item.id}, -${item.qty})" class="text-zinc-500 hover:text-crimson-400 p-1">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `).join('');
+      }
+    }
+
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('cart-drawer-overlay');
+      if (open) {
+        overlay.classList.remove('hidden');
+        drawer.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+    }
+
+    function checkoutCartWhatsApp() {
+      if (cart.length === 0) return;
+      let text = "Hello Kronos Apex! I would like to order the following gear:\n\n";
+      let total = 0;
+      cart.forEach((i, idx) => {
+        text += `${idx + 1}. ${i.name} (x${i.qty}) - $${(i.price * i.qty).toFixed(2)}\n`;
+        total += i.price * i.qty;
+      });
+      text += `\n*Total Order Amount: $${total.toFixed(2)}*\n\nPlease confirm availability and delivery/locker collection!`;
+      
+      const url = `https://wa.me/14805550198?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function orderProductWhatsApp(productName, price) {
+      const text = `Hello Kronos Apex! I would like to order: *${productName}* ($${price.toFixed(2)}). Please advise on pickup or delivery!`;
+      const url = `https://wa.me/14805550198?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function filterShop(cat) {
+      document.querySelectorAll('.shop-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-crimson-600', 'text-white');
+        btn.classList.add('bg-deep-850', 'text-zinc-300');
+      });
+      event.target.classList.add('active', 'bg-crimson-600', 'text-white');
+      event.target.classList.remove('bg-deep-850', 'text-zinc-300');
+
+      document.querySelectorAll('.shop-card').forEach(card => {
+        if (cat === 'all' || card.classList.contains(cat)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       6. MEMBERSHIP CYCLE TOGGLE & SIGNUP MODAL
+    ────────────────────────────────────────────────────────────── */
+    function setBillingCycle(cycle) {
+      const mBtn = document.getElementById('billing-monthly-btn');
+      const aBtn = document.getElementById('billing-annual-btn');
+      const pSilver = document.getElementById('price-silver');
+      const pPro = document.getElementById('price-pro');
+      const pVip = document.getElementById('price-vip');
+      const nSilver = document.getElementById('billed-silver-note');
+      const nPro = document.getElementById('billed-pro-note');
+      const nVip = document.getElementById('billed-vip-note');
+
+      if (cycle === 'annual') {
+        aBtn.className = 'px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all flex items-center gap-2';
+        mBtn.className = 'px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all';
+        pSilver.innerText = '49';
+        pPro.innerText = '79';
+        pVip.innerText = '149';
+        nSilver.innerText = 'Billed annually ($588/yr) • Save $120';
+        nPro.innerText = 'Billed annually ($948/yr) • Save $240';
+        nVip.innerText = 'Billed annually ($1,788/yr) • Save $360';
+      } else {
+        mBtn.className = 'px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider bg-crimson-600 text-white transition-all';
+        aBtn.className = 'px-6 py-2.5 rounded-full text-xs sm:text-sm font-heading font-bold uppercase tracking-wider text-zinc-400 hover:text-white transition-all flex items-center gap-2';
+        pSilver.innerText = '59';
+        pPro.innerText = '99';
+        pVip.innerText = '179';
+        nSilver.innerText = 'Billed monthly • Cancel anytime';
+        nPro.innerText = 'Billed monthly • Complete 24/7 keycard';
+        nVip.innerText = 'Billed monthly • All-inclusive';
+      }
+    }
+
+    function openMembershipModal(planTitle) {
+      document.getElementById('modal-plan-title').innerText = planTitle;
+      document.getElementById('membership-modal').classList.remove('hidden');
+    }
+
+    function closeMembershipModal() {
+      document.getElementById('membership-modal').classList.add('hidden');
+    }
+
+    function handleMembershipSignup(e) {
+      e.preventDefault();
+      const plan = document.getElementById('modal-plan-title').innerText;
+      const name = document.getElementById('modal-name').value;
+      const phone = document.getElementById('modal-phone').value;
+
+      closeMembershipModal();
+      showToast('Registration Initiated', `Welcome, ${name}! Redirecting to WhatsApp concierge...`);
+
+      setTimeout(() => {
+        const text = `Hello Kronos Apex! I'm ${name} (${phone}) and I just submitted my registration for *${plan}*. Please provide my activation details!`;
+        window.open(`https://wa.me/14805550198?text=${encodeURIComponent(text)}`, '_blank');
+      }, 1200);
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       7. CONTACT FORM SUBMISSION & FAQS
+    ────────────────────────────────────────────────────────────── */
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('contact-name').value;
+      const interest = document.getElementById('contact-interest').value;
+      const msg = document.getElementById('contact-message').value;
+
+      const submitBtn = document.getElementById('contact-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing...`;
+
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>SEND MESSAGE TO CONCIERGE</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+        document.getElementById('contact-success').classList.remove('hidden');
+        showToast('Message Delivered', `Thank you ${name}. Our coaching team is reviewing your inquiry.`);
+        document.getElementById('contact-form').reset();
+      }, 1000);
+    }
+
+    function toggleFaq(btn) {
+      const content = btn.nextElementSibling;
+      const icon = btn.querySelector('i');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    function handleNewsletter(e) {
+      e.preventDefault();
+      showToast('Subscribed to Kronos Wire', 'Check your inbox for exclusive training cycles.');
+      e.target.reset();
+    }
+
+    /* ─────────────────────────────────────────────────────────────
+       8. MOBILE MENU & TOAST NOTIFICATION
+    ────────────────────────────────────────────────────────────── */
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      const icon = document.getElementById('mobile-menu-icon');
+      if (menu.classList.contains('hidden')) {
+        menu.classList.remove('hidden');
+        icon.className = 'fa-solid fa-xmark text-lg text-crimson-500';
+      } else {
+        menu.classList.add('hidden');
+        icon.className = 'fa-solid fa-bars text-lg';
+      }
+    }
+
+    function closeMobileMenu() {
+      document.getElementById('mobile-menu').classList.add('hidden');
+      document.getElementById('mobile-menu-icon').className = 'fa-solid fa-bars text-lg';
+    }
+
+    let toastTimeout;
+    function showToast(title, msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-msg').innerText = msg;
+
+      clearTimeout(toastTimeout);
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+  </script>
+</body>
+</html>
