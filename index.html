@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -91,11 +91,16 @@
     /* Base Body & Canvas Background - Deep Obsidian Black with Smooth Radial Gradient */
     html {
       background-color: #0A0A0E;
+      overflow-x: hidden;
+      max-width: 100vw;
     }
     body {
       background-color: #0A0A0E !important;
       background-image: radial-gradient(circle at 50% 18%, rgba(var(--primary-rgb), 0.07) 0%, rgba(10, 10, 14, 0.98) 60%, #0A0A0E 100%) !important;
       background-attachment: fixed;
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
     }
 
     /* Custom Scrollbar */
@@ -152,17 +157,60 @@
       transform: translateY(0);
     }
 
-    /* 3D Background Canvas - Softly Placed Behind UI Text */
-    #three-bg-canvas {
+    /* 3D Background Canvas & Container - Softly Placed Behind UI Text & Responsive Scaling */
+    #three-canvas-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      max-width: 100%;
+      max-height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    #three-bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
       z-index: 0;
       pointer-events: none;
       opacity: 0.52;
       transition: opacity 0.5s ease;
+      display: block;
+    }
+
+    /* Dynamic text & container layout stabilization overrides */
+    #business-title,
+    #business-address {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .brand-title-split {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .hero-main-title,
+    #hero-brand-highlight,
+    .brand-title {
+      overflow-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
     }
 
     /* Fluid Clamp Typography for Hero Title - Scaled Down ~20% */
@@ -257,7 +305,9 @@
   <!-- ═══════════════════════════════════════════════════════
        INTERACTIVE 3D THREE.JS CANVAS BACKGROUND
   ════════════════════════════════════════════════════════ -->
-  <canvas id="three-bg-canvas" aria-hidden="true"></canvas>
+  <div id="three-canvas-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden w-full h-full max-w-full max-h-full">
+    <canvas id="three-bg-canvas" class="w-full h-full block pointer-events-none" aria-hidden="true"></canvas>
+  </div>
 
   <!-- Subtle High-Tech Secondary Grid Lines (Ultra-Subtle) -->
   <div id="cyber-grid" class="fixed inset-0 pointer-events-none z-[1] opacity-10 transition-all duration-700"></div>
@@ -274,16 +324,16 @@
       <div class="flex items-center justify-between h-16 sm:h-18">
         
         <!-- Brand Logo -->
-        <a href="#home" class="flex items-center gap-3 group cursor-pointer focus:outline-none">
-          <div id="nav-logo-box" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center border border-white/15 group-hover:scale-105 transition-all duration-300 shadow-md">
+        <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group cursor-pointer focus:outline-none min-w-0 max-w-[65%] sm:max-w-[48%] md:max-w-[340px]">
+          <div id="nav-logo-box" class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center border border-white/15 group-hover:scale-105 transition-all duration-300 shadow-md">
             <i class="fa-solid fa-dumbbell text-white text-base sm:text-lg transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
           </div>
-          <div class="flex flex-col">
-            <span class="font-heading font-black tracking-wider text-lg sm:text-xl text-white flex items-center gap-1.5 brand-title-split">
-              <span id="business-title" class="brand-title">KRONOS</span> 
-              <span class="text-crimson-500 font-light brand-accent-span">APEX</span>
+          <div class="flex flex-col min-w-0 overflow-hidden">
+            <span class="font-heading font-black tracking-wider text-base sm:text-lg md:text-xl text-white flex items-center gap-1.5 truncate max-w-full">
+              <span id="business-title" class="brand-title truncate">KRONOS <span class="text-crimson-500 font-light brand-accent-span shrink-0">APEX</span></span>
             </span>
-            <span id="header-location" class="brand-location text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium -mt-1">Mesa, AZ</span>
+            <span id="business-address" class="brand-location text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium -mt-1 truncate block max-w-full">1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204</span>
+            <span id="header-location" class="hidden" aria-hidden="true">Mesa, AZ</span>
           </div>
         </a>
 
@@ -384,15 +434,15 @@
         <div class="max-w-[1100px] mx-auto text-center relative z-10 w-full">
           
           <!-- Secondary Status Tag -->
-          <div id="hero-status-badge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-deep-900/90 text-xs font-semibold tracking-wider uppercase mb-6 shadow-md transition-all" style="border: 1px solid var(--secondary); color: var(--secondary);">
-            <span class="w-1.5 h-1.5 rounded-full animate-ping" style="background-color: var(--secondary);"></span>
-            <span class="text-zinc-200">24/7 Biometric Access • <span class="location-full-text">The #1 Gym in <span class="city-name font-bold text-white">Mesa, AZ</span></span></span>
+          <div id="hero-status-badge" class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-deep-900/90 text-xs font-semibold tracking-wider uppercase mb-6 shadow-md transition-all max-w-[95vw] overflow-hidden" style="border: 1px solid var(--secondary); color: var(--secondary);">
+            <span class="w-1.5 h-1.5 rounded-full animate-ping shrink-0" style="background-color: var(--secondary);"></span>
+            <span class="text-zinc-200 truncate">24/7 Biometric Access • <span class="location-full-text">The #1 Gym in <span class="city-name font-bold text-white">Mesa, AZ</span></span></span>
           </div>
 
           <!-- Main Hero Headline: Scaled down 20% with dynamic fluid clamp typography -->
-          <h1 class="hero-main-title font-heading font-black tracking-tight uppercase mb-4">
+          <h1 class="hero-main-title font-heading font-black tracking-tight uppercase mb-4 max-w-full overflow-hidden">
             <span class="headline-prefix text-white inline-block">FORGE YOUR<br class="hidden sm:inline"> ULTIMATE</span><br>
-            <span class="highlight inline-block font-extrabold italic tracking-tight" id="hero-brand-highlight">
+            <span class="highlight inline-block font-extrabold italic tracking-tight max-w-full overflow-hidden" id="hero-brand-highlight">
               <span class="brand-title">KRONOS APEX</span>
             </span>
           </h1>
@@ -2098,19 +2148,66 @@
     }
 
     /* ─────────────────────────────────────────────────────────────
+       SAFE DECODING & SANITIZATION HELPERS
+    ────────────────────────────────────────────────────────────── */
+
+    const FALLBACK_BUSINESS = 'KRONOS APEX';
+    const FALLBACK_ADDRESS  = '1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204';
+    const FALLBACK_LOCATION = 'Mesa, AZ';
+    const MAX_BUSINESS_LENGTH = 30;
+
+    /** Safely decodes a URI component — guards against URIError on malformed %-sequences. */
+    function safeDecodeParam(val) {
+      if (typeof val !== 'string' || !val) return '';
+      try {
+        return decodeURIComponent(val.replace(/\+/g, ' '));
+      } catch (e) {
+        try { return decodeURI(val.replace(/\+/g, ' ')); }
+        catch (e2) { return val.replace(/\+/g, ' '); }
+      }
+    }
+
+    /** Strips HTML/script tags and control chars to prevent XSS. */
+    function sanitizeInput(str) {
+      if (typeof str !== 'string' || !str) return '';
+      return str
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]+>/g, '')
+        .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+        .trim();
+    }
+
+    /** Escapes HTML special characters for safe innerHTML assembly. */
+    function escapeHTML(str) {
+      if (typeof str !== 'string') return '';
+      var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+      return str.replace(/[&<>"']/g, function(c){ return m[c]; });
+    }
+
+    /** Truncates a name to maxLen characters (default: MAX_BUSINESS_LENGTH). */
+    function truncateBusinessName(name, maxLen) {
+      maxLen = maxLen || MAX_BUSINESS_LENGTH;
+      if (!name || typeof name !== 'string') return '';
+      return name.length > maxLen ? name.slice(0, maxLen) : name;
+    }
+
+    /* ─────────────────────────────────────────────────────────────
        URL QUERY PARAMETER ENGINE (initDynamicLandingPage)
     ────────────────────────────────────────────────────────────── */
     function initDynamicLandingPage() {
       // Support standard search (?key=val) and hash query params (#home?key=val)
       let searchStr = window.location.search;
-      if (!searchStr && window.location.hash.includes('?')) {
+      if (!searchStr && window.location.hash && window.location.hash.includes('?')) {
         searchStr = '?' + window.location.hash.split('?')[1];
       }
-      const params = new URLSearchParams(searchStr);
+      const params = new URLSearchParams(searchStr || '');
 
-      // 1. Business Name (business or name)
-      const business = params.get('business') || params.get('name');
-      const cleanName = business ? decodeURIComponent(business.replace(/\+/g, ' ')).trim() : "KRONOS APEX";
+      // 1. Business Name (?business= or ?name=) — safe decode + sanitize + strict fallback + 30-char truncation
+      const rawBusiness = params.get('business') || params.get('name');
+      const sanitizedBusiness = sanitizeInput(safeDecodeParam(rawBusiness));
+      let cleanName = (sanitizedBusiness && sanitizedBusiness.length > 0) ? sanitizedBusiness : FALLBACK_BUSINESS;
+      cleanName = truncateBusinessName(cleanName, MAX_BUSINESS_LENGTH);
       window.__DYNAMIC_BRAND_NAME = cleanName;
 
       // Header Sanitization: Sanitize long names before dashes/colons for clean header display without layout breaking
@@ -2134,27 +2231,35 @@
       const navRest = navParts.slice(1).join(' ');
 
       // Update brand headings and titles
-      document.querySelectorAll('.brand-title').forEach(el => {
-        el.innerText = cleanName;
+      document.querySelectorAll('.brand-title').forEach(function(el) {
+        if (busTitleEl && (el === busTitleEl || busTitleEl.contains(el))) return;
+        el.textContent = cleanName;
       });
       const busTitleEl = document.getElementById('business-title');
-      if (busTitleEl) busTitleEl.innerText = navFirst;
+      if (busTitleEl) {
+        if (navRest) {
+          busTitleEl.innerHTML = escapeHTML(navFirst) + ' <span class="text-crimson-500 font-light brand-accent-span shrink-0">' + escapeHTML(navRest) + '</span>';
+        } else {
+          busTitleEl.textContent = cleanName;
+        }
+        busTitleEl.setAttribute('title', cleanName);
+      }
 
       // Update preloader display
       const preloaderBrand = document.getElementById('preloader-brand');
-      if (preloaderBrand) preloaderBrand.innerText = cleanName;
+      if (preloaderBrand) preloaderBrand.textContent = cleanName;
 
       // Hero Gym Highlight (stays crisp, zero text glow)
       const heroHighlight = document.getElementById('hero-brand-highlight');
       if (heroHighlight) {
-        heroHighlight.innerHTML = `<span class="brand-title">${cleanName}</span>`;
+        heroHighlight.innerHTML = '<span class="brand-title">' + escapeHTML(cleanName) + '</span>';
       }
 
       document.querySelectorAll('.brand-title-split').forEach(el => {
         if (navRest) {
-          el.innerHTML = `${navFirst} <span class="text-crimson-500 font-light brand-accent-span">${navRest}</span>`;
+          el.innerHTML = escapeHTML(navFirst) + ' <span class="text-crimson-500 font-light brand-accent-span">' + escapeHTML(navRest) + '</span>';
         } else {
-          el.innerHTML = headerBrandName;
+          el.textContent = headerBrandName;
         }
       });
 
@@ -2214,9 +2319,9 @@
       let shortLocation = "Mesa, AZ";
 
       if (addressParam) {
-        fullAddress = decodeURIComponent(addressParam.replace(/\+/g, ' ')).trim();
+        fullAddress = sanitizeInput(safeDecodeParam(addressParam));
         if (locParam) {
-          shortLocation = decodeURIComponent(locParam.replace(/\+/g, ' ')).trim();
+          shortLocation = sanitizeInput(safeDecodeParam(locParam));
         } else {
           // Extract city/state if available
           const commaParts = fullAddress.split(',');
@@ -2227,20 +2332,20 @@
           }
         }
       } else if (locParam) {
-        shortLocation = decodeURIComponent(locParam.replace(/\+/g, ' ')).trim();
+        shortLocation = sanitizeInput(safeDecodeParam(locParam));
         fullAddress = `100 Athletic Way, Suite 100, ${shortLocation}`;
       }
 
       // Update Address & Location elements
-      document.querySelectorAll('.brand-location, #header-location, .city-name').forEach(el => {
-        el.innerText = shortLocation;
+      document.querySelectorAll('.brand-location:not(#business-address), .city-name').forEach(function(el) {
+        el.textContent = shortLocation;
       });
       document.querySelectorAll('.location-full-text').forEach(el => {
-        el.innerHTML = `The #1 Gym in <span class="city-name font-bold text-white">${shortLocation}</span>`;
+        el.innerHTML = 'The #1 Gym in <span class="city-name font-bold text-white">' + escapeHTML(shortLocation) + '</span>';
       });
       const contactAddrEl = document.getElementById('contact-address-text');
       if (contactAddrEl) {
-        contactAddrEl.innerHTML = `${fullAddress}`;
+        contactAddrEl.textContent = fullAddress;
       }
       const mapsLink = document.getElementById('contact-maps-link');
       if (mapsLink) {
@@ -2258,7 +2363,7 @@
 
       const phoneLink = document.getElementById('contact-phone-link');
       const phoneText = document.getElementById('contact-phone-text');
-      if (phoneText) phoneText.innerText = cleanPhone;
+      if (phoneText) phoneText.textContent = cleanPhone;
       if (phoneLink) phoneLink.href = `tel:${cleanPhoneDigits}`;
 
       // Update WhatsApp links across the entire UI
@@ -2271,23 +2376,19 @@
 
       // 6. Dynamic Email (email)
       const emailParam = params.get('email');
-      const cleanEmail = emailParam 
-        ? decodeURIComponent(emailParam.trim()) 
-        : "concierge@kronosapex.com";
+      const cleanEmail = sanitizeInput(safeDecodeParam(emailParam)) || "concierge@kronosapex.com";
       window.__DYNAMIC_EMAIL = cleanEmail;
 
       const emailLink = document.getElementById('contact-email-link');
       const emailText = document.getElementById('contact-email-text');
-      if (emailText) emailText.innerText = cleanEmail;
+      if (emailText) emailText.textContent = cleanEmail;
       if (emailLink) emailLink.href = `mailto:${cleanEmail}`;
 
       // 7. Subtitle (sub)
       const sub = params.get('sub');
-      const cleanSub = sub 
-        ? decodeURIComponent(sub.replace(/\+/g, ' ')).trim() 
-        : "A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.";
+      const cleanSub = sanitizeInput(safeDecodeParam(params.get('sub'))) || "A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.";
       document.querySelectorAll('.hero-subtitle, #hero-subtitle').forEach(el => {
-        el.innerText = cleanSub;
+        el.textContent = cleanSub;
       });
 
       // 8. Call To Action (cta)
@@ -2296,7 +2397,7 @@
         ? decodeURIComponent(cta.replace(/\+/g, ' ')).trim() 
         : "EXPLORE MEMBERSHIPS";
       document.querySelectorAll('.main-cta-btn .cta-text, #hero-cta-btn .cta-text').forEach(el => {
-        el.innerText = cleanCta;
+        el.textContent = cleanCta;
       });
 
       // 9. Particle Engine Dot Colors
@@ -2492,6 +2593,11 @@
           color: var(--contrast-text) !important;
         }
       `;
+
+      // Trigger Three.js canvas resize
+      if (typeof window.__resizeThreeCanvas === 'function') {
+        window.__resizeThreeCanvas();
+      }
     }
 
     /* ─────────────────────────────────────────────────────────────
@@ -3120,12 +3226,16 @@
       }
       animate();
 
-      window.addEventListener('resize', () => {
+      // Expose resize handler globally so initDynamicLandingPage can trigger it
+      window.__resizeThreeCanvas = function() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         updateLayout();
-      });
+      };
+
+      window.addEventListener('resize', window.__resizeThreeCanvas);
     })();
 
     /* ─────────────────────────────────────────────────────────────
