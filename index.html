@@ -217,22 +217,28 @@
       hyphens: auto;
     }
 
-    /* Stable navbar brand column — never expands past its share */
+    /* Stable navbar brand column — flex-shrinks gracefully on smaller viewports */
     .nav-brand-col {
       min-width: 0;
       flex: 0 1 auto;
-      overflow: hidden;
       display: flex;
       align-items: center;
       gap: 10px;
+      /* No overflow-hidden here — let flex-shrink handle scale-down naturally */
     }
     .nav-brand-title-line {
       display: block;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      /* Fluid font scaling: comfortable at all breakpoints for up to 25 chars */
+      font-size: clamp(0.75rem, 2.4vw, 1.125rem);
       line-height: 1.25;
+      letter-spacing: 0.03em;
+      /* Allow text to shrink within the flex item instead of being clipped */
+      min-width: 0;
+      overflow: visible;
+    }
+    #business-title {
+      white-space: nowrap;
     }
 
     /* Fluid Clamp Typography for Hero Title - Scaled Down ~20% */
@@ -345,12 +351,12 @@
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 sm:h-18">
         
-        <!-- Brand Logo: clean title only (max 25 chars truncated with ...), never address in header -->
-        <a href="#home" class="nav-brand-col group cursor-pointer focus:outline-none" style="max-width:clamp(140px, 45%, 320px);">
-          <div id="nav-logo-box" class="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center border border-white/15 group-hover:scale-105 transition-all duration-300 shadow-md" style="background: linear-gradient(135deg, var(--primary) 0%, #12121a 100%); border-color: rgba(var(--primary-rgb),0.4);">
-            <i class="fa-solid fa-dumbbell text-white text-base transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+        <!-- Brand Logo: clean title only (max 25 chars with ...), never address in header -->
+        <a href="#home" class="nav-brand-col group cursor-pointer focus:outline-none flex-shrink min-w-0">
+          <div id="nav-logo-box" class="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-xl flex items-center justify-center border group-hover:scale-105 transition-all duration-300 shadow-md" style="background: linear-gradient(135deg, var(--primary) 0%, #12121a 100%); border-color: rgba(var(--primary-rgb),0.4);">
+            <i class="fa-solid fa-dumbbell text-white text-sm sm:text-base transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
           </div>
-          <span class="nav-brand-title-line font-heading font-black tracking-wider text-sm sm:text-base md:text-lg text-white">
+          <span class="nav-brand-title-line font-heading font-black tracking-tight text-white">
             <span id="business-title" class="brand-title">KRONOS <span class="font-light brand-accent-span" style="color:var(--primary);">APEX</span></span>
           </span>
         </a>
