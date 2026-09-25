@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
@@ -28,14 +28,14 @@
           },
           colors: {
             crimson: {
-              300: '#fca5a5',
-              400: '#f87171',
-              500: '#ef4444',
-              600: '#dc2626',
-              700: '#b91c1c',
-              800: '#991b1b',
-              900: '#7f1d1d',
-              950: '#450a0a'
+              300: 'rgb(var(--primary-rgb) / 0.45)',
+              400: 'rgb(var(--primary-rgb) / 0.7)',
+              500: 'rgb(var(--primary-rgb) / 1)',
+              600: 'rgb(var(--primary-rgb) / 1)',
+              700: 'rgb(var(--primary-rgb) / 0.85)',
+              800: 'rgb(var(--primary-rgb) / 0.7)',
+              900: 'rgb(var(--primary-rgb) / 0.3)',
+              950: 'rgb(var(--primary-rgb) / 0.15)'
             },
             deep: {
               950: '#050507',
@@ -187,14 +187,18 @@
     }
 
     /* Dynamic text & container layout stabilization overrides */
-    #business-title,
-    #business-address {
+    #business-title {
       display: inline-block;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       vertical-align: middle;
+    }
+
+    /* Address is NEVER shown in the navbar — reserved exclusively for the contact/location section */
+    #business-address {
+      display: none !important;
     }
 
     .brand-title-split {
@@ -211,6 +215,24 @@
       overflow-wrap: break-word;
       word-break: break-word;
       hyphens: auto;
+    }
+
+    /* Stable navbar brand column — never expands past its share */
+    .nav-brand-col {
+      min-width: 0;
+      flex: 0 1 auto;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-brand-title-line {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      line-height: 1.25;
     }
 
     /* Fluid Clamp Typography for Hero Title - Scaled Down ~20% */
@@ -323,18 +345,14 @@
     <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 sm:h-18">
         
-        <!-- Brand Logo -->
-        <a href="#home" class="flex items-center gap-2.5 sm:gap-3 group cursor-pointer focus:outline-none min-w-0 max-w-[65%] sm:max-w-[48%] md:max-w-[340px]">
-          <div id="nav-logo-box" class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-br from-crimson-600 via-crimson-700 to-black flex items-center justify-center border border-white/15 group-hover:scale-105 transition-all duration-300 shadow-md">
-            <i class="fa-solid fa-dumbbell text-white text-base sm:text-lg transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+        <!-- Brand Logo: clean title only (max 25 chars truncated with ...), never address in header -->
+        <a href="#home" class="nav-brand-col group cursor-pointer focus:outline-none" style="max-width:clamp(140px, 45%, 320px);">
+          <div id="nav-logo-box" class="w-9 h-9 shrink-0 rounded-xl flex items-center justify-center border border-white/15 group-hover:scale-105 transition-all duration-300 shadow-md" style="background: linear-gradient(135deg, var(--primary) 0%, #12121a 100%); border-color: rgba(var(--primary-rgb),0.4);">
+            <i class="fa-solid fa-dumbbell text-white text-base transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
           </div>
-          <div class="flex flex-col min-w-0 overflow-hidden">
-            <span class="font-heading font-black tracking-wider text-base sm:text-lg md:text-xl text-white flex items-center gap-1.5 truncate max-w-full">
-              <span id="business-title" class="brand-title truncate">KRONOS <span class="text-crimson-500 font-light brand-accent-span shrink-0">APEX</span></span>
-            </span>
-            <span id="business-address" class="brand-location text-[9px] sm:text-[10px] uppercase tracking-[0.25em] text-zinc-400 font-medium -mt-1 truncate block max-w-full">1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204</span>
-            <span id="header-location" class="hidden" aria-hidden="true">Mesa, AZ</span>
-          </div>
+          <span class="nav-brand-title-line font-heading font-black tracking-wider text-sm sm:text-base md:text-lg text-white">
+            <span id="business-title" class="brand-title">KRONOS <span class="font-light brand-accent-span" style="color:var(--primary);">APEX</span></span>
+          </span>
         </a>
 
         <!-- Desktop Navigation Links -->
@@ -1661,6 +1679,8 @@
                 <div>
                   <div class="text-white font-semibold"><span class="brand-title">Kronos Apex</span> Flagship</div>
                   <div id="contact-address-text" class="text-zinc-400 text-xs">1126 S Gilbert Rd, Suite 104, <span class="city-name font-medium">Mesa, AZ 85204</span></div>
+                  <!-- Business address container strictly in Sanctuary Headquarters, never in header -->
+                  <span id="business-address" class="hidden" aria-hidden="true"></span>
                 </div>
               </div>
 
@@ -2154,16 +2174,26 @@
     const FALLBACK_BUSINESS = 'KRONOS APEX';
     const FALLBACK_ADDRESS  = '1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204';
     const FALLBACK_LOCATION = 'Mesa, AZ';
-    const MAX_BUSINESS_LENGTH = 30;
+    const FALLBACK_COLOR    = '#FF1E27';
+    const FALLBACK_PCOLOR   = '#FF8C00';
+    const FALLBACK_PHONE    = '+1 (480) 555-0198';
+    const FALLBACK_EMAIL    = 'concierge@kronosapex.com';
+    const FALLBACK_SUB      = 'A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.';
+    const FALLBACK_CTA      = 'EXPLORE MEMBERSHIPS';
+    const MAX_BUSINESS_LENGTH = 25;
 
-    /** Safely decodes a URI component — guards against URIError on malformed %-sequences. */
+    /** Safely decodes a URI component — handles '+', '%20', and malformed %-sequences gracefully. */
     function safeDecodeParam(val) {
       if (typeof val !== 'string' || !val) return '';
+      const unplussed = val.replace(/\+/g, ' ');
       try {
-        return decodeURIComponent(val.replace(/\+/g, ' '));
+        return decodeURIComponent(unplussed);
       } catch (e) {
-        try { return decodeURI(val.replace(/\+/g, ' ')); }
-        catch (e2) { return val.replace(/\+/g, ' '); }
+        try { return decodeURI(unplussed); }
+        catch (e2) {
+          try { return decodeURIComponent(unplussed.replace(/%(?![0-9a-fA-F]{2})/g, '%25')); }
+          catch (e3) { return unplussed; }
+        }
       }
     }
 
@@ -2185,11 +2215,30 @@
       return str.replace(/[&<>"']/g, function(c){ return m[c]; });
     }
 
-    /** Truncates a name to maxLen characters (default: MAX_BUSINESS_LENGTH). */
+    /** Truncates business name to maxLen characters (default: 25 chars) and appends '...' if exceeded. */
     function truncateBusinessName(name, maxLen) {
       maxLen = maxLen || MAX_BUSINESS_LENGTH;
       if (!name || typeof name !== 'string') return '';
-      return name.length > maxLen ? name.slice(0, maxLen) : name;
+      const trimmed = name.trim();
+      if (trimmed.length > maxLen) {
+        return trimmed.slice(0, maxLen).trim() + '...';
+      }
+      return trimmed;
+    }
+
+    /** Normalizes and validates hex color strings. */
+    function normalizeHexColor(raw, fallback) {
+      if (!raw) return fallback;
+      let clean = sanitizeInput(safeDecodeParam(raw)).trim();
+      if (!clean) return fallback;
+      if (!clean.startsWith('#')) clean = '#' + clean;
+      if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(clean)) {
+        if (clean.length === 4) {
+          clean = '#' + clean[1] + clean[1] + clean[2] + clean[2] + clean[3] + clean[3];
+        }
+        return clean.toUpperCase();
+      }
+      return fallback;
     }
 
     /* ─────────────────────────────────────────────────────────────
@@ -2203,12 +2252,13 @@
       }
       const params = new URLSearchParams(searchStr || '');
 
-      // 1. Business Name (?business= or ?name=) — safe decode + sanitize + strict fallback + 30-char truncation
+      // 1. Business Name (?business= or ?name=) — safe decode + sanitize + strict fallback + 25-char truncation with '...'
       const rawBusiness = params.get('business') || params.get('name');
       const sanitizedBusiness = sanitizeInput(safeDecodeParam(rawBusiness));
-      let cleanName = (sanitizedBusiness && sanitizedBusiness.length > 0) ? sanitizedBusiness : FALLBACK_BUSINESS;
-      cleanName = truncateBusinessName(cleanName, MAX_BUSINESS_LENGTH);
+      const fullBusinessName = (sanitizedBusiness && sanitizedBusiness.length > 0) ? sanitizedBusiness : FALLBACK_BUSINESS;
+      const cleanName = truncateBusinessName(fullBusinessName, MAX_BUSINESS_LENGTH);
       window.__DYNAMIC_BRAND_NAME = cleanName;
+      window.__FULL_BRAND_NAME = fullBusinessName;
 
       // Header Sanitization: Sanitize long names before dashes/colons for clean header display without layout breaking
       let headerBrandName = cleanName;
@@ -2230,56 +2280,54 @@
       const navFirst = navParts[0] || headerBrandName;
       const navRest = navParts.slice(1).join(' ');
 
-      // Update brand headings and titles
+      // Inject clean title into navbar: #business-title (Max 25 chars, no address in navbar)
+      const busTitleEl = document.getElementById('business-title');
+      if (busTitleEl) {
+        if (navRest) {
+          busTitleEl.innerHTML = escapeHTML(navFirst) + ' <span class="font-light brand-accent-span shrink-0" style="color:var(--primary);">' + escapeHTML(navRest) + '</span>';
+        } else {
+          busTitleEl.textContent = headerBrandName;
+        }
+        busTitleEl.setAttribute('title', fullBusinessName);
+      }
+
+      // Update other brand headings and titles
       document.querySelectorAll('.brand-title').forEach(function(el) {
         if (busTitleEl && (el === busTitleEl || busTitleEl.contains(el))) return;
         el.textContent = cleanName;
       });
-      const busTitleEl = document.getElementById('business-title');
-      if (busTitleEl) {
-        if (navRest) {
-          busTitleEl.innerHTML = escapeHTML(navFirst) + ' <span class="text-crimson-500 font-light brand-accent-span shrink-0">' + escapeHTML(navRest) + '</span>';
-        } else {
-          busTitleEl.textContent = cleanName;
-        }
-        busTitleEl.setAttribute('title', cleanName);
-      }
 
       // Update preloader display
       const preloaderBrand = document.getElementById('preloader-brand');
       if (preloaderBrand) preloaderBrand.textContent = cleanName;
 
-      // Hero Gym Highlight (stays crisp, zero text glow)
+      // Hero Gym Highlight
       const heroHighlight = document.getElementById('hero-brand-highlight');
       if (heroHighlight) {
         heroHighlight.innerHTML = '<span class="brand-title">' + escapeHTML(cleanName) + '</span>';
       }
 
       document.querySelectorAll('.brand-title-split').forEach(el => {
+        if (busTitleEl && (el === busTitleEl || busTitleEl.contains(el))) return;
         if (navRest) {
-          el.innerHTML = escapeHTML(navFirst) + ' <span class="text-crimson-500 font-light brand-accent-span">' + escapeHTML(navRest) + '</span>';
+          el.innerHTML = escapeHTML(navFirst) + ' <span class="font-light brand-accent-span" style="color:var(--primary);">' + escapeHTML(navRest) + '</span>';
         } else {
           el.textContent = headerBrandName;
         }
       });
 
-      // 2. Primary Theme Color (color)
-      const color = params.get('color');
-      const hexColor = color 
-        ? (color.startsWith('#') ? color : `#${color}`).toUpperCase() 
-        : "#FF1E27"; // Default Red #FF1E27
-
+      // 2. Primary Theme Color (color / primary / primaryColor / themeColor)
+      const rawColor = params.get('color') || params.get('primary') || params.get('primaryColor') || params.get('themeColor');
+      const hexColor = normalizeHexColor(rawColor, FALLBACK_COLOR);
       const rgb = hexToRgb(hexColor) || { r: 255, g: 30, b: 39 };
 
-      // Dynamic Font Contrast Engine Calculation: Black or White
+      // Dynamic Font Contrast Engine Calculation: Black or White (WCAG Luminance)
       const contrastText = getContrastColor(hexColor);
 
-      // 3. Secondary / Particle Color (pcolor / particleColor or derived complementary)
-      const pcolorParam = params.get('particleColor') || params.get('pcolor');
-      let hexPColor;
-      if (pcolorParam) {
-        hexPColor = (pcolorParam.startsWith('#') ? pcolorParam : `#${pcolorParam}`).toUpperCase();
-      } else {
+      // 3. Secondary / Particle Color (pcolor / particleColor / secondaryColor / secondary or derived complementary)
+      const rawPColor = params.get('pcolor') || params.get('particleColor') || params.get('secondaryColor') || params.get('secondary');
+      let hexPColor = normalizeHexColor(rawPColor, null);
+      if (!hexPColor) {
         hexPColor = getComplementarySecondaryColor(hexColor);
       }
 
@@ -2312,18 +2360,18 @@
       }
 
       // 4. Dynamic Address / Location (address / loc / location / city)
+      // Address appears strictly in Sanctuary Headquarters / contact section, NEVER in the navbar/header.
       const addressParam = params.get('address') || params.get('loc');
       const locParam = params.get('location') || params.get('city');
 
-      let fullAddress = "1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204";
-      let shortLocation = "Mesa, AZ";
+      let fullAddress = FALLBACK_ADDRESS;
+      let shortLocation = FALLBACK_LOCATION;
 
       if (addressParam) {
         fullAddress = sanitizeInput(safeDecodeParam(addressParam));
         if (locParam) {
           shortLocation = sanitizeInput(safeDecodeParam(locParam));
         } else {
-          // Extract city/state if available
           const commaParts = fullAddress.split(',');
           if (commaParts.length >= 2) {
             shortLocation = commaParts.slice(-2).join(',').trim();
@@ -2336,27 +2384,34 @@
         fullAddress = `100 Athletic Way, Suite 100, ${shortLocation}`;
       }
 
-      // Update Address & Location elements
-      document.querySelectorAll('.brand-location:not(#business-address), .city-name').forEach(function(el) {
-        el.textContent = shortLocation;
-      });
-      document.querySelectorAll('.location-full-text').forEach(el => {
-        el.innerHTML = 'The #1 Gym in <span class="city-name font-bold text-white">' + escapeHTML(shortLocation) + '</span>';
-      });
+      // Inject address strictly in Sanctuary Headquarters / contact section
       const contactAddrEl = document.getElementById('contact-address-text');
       if (contactAddrEl) {
         contactAddrEl.textContent = fullAddress;
+      }
+      const busAddressEl = document.getElementById('business-address');
+      if (busAddressEl) {
+        busAddressEl.textContent = fullAddress;
+        busAddressEl.setAttribute('title', fullAddress);
       }
       const mapsLink = document.getElementById('contact-maps-link');
       if (mapsLink) {
         mapsLink.href = `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`;
       }
 
+      // Update location and city labels in body/footer
+      document.querySelectorAll('.brand-location:not(#business-address), .city-name').forEach(function(el) {
+        el.textContent = shortLocation;
+      });
+      document.querySelectorAll('.location-full-text').forEach(el => {
+        el.innerHTML = 'The #1 Gym in <span class="city-name font-bold text-white">' + escapeHTML(shortLocation) + '</span>';
+      });
+
       // 5. Dynamic Phone Number (phone)
       const phoneParam = params.get('phone');
       const cleanPhone = phoneParam 
-        ? decodeURIComponent(phoneParam.replace(/\+/g, ' ')).trim() 
-        : "+1 (480) 555-0198";
+        ? sanitizeInput(safeDecodeParam(phoneParam))
+        : FALLBACK_PHONE;
       const cleanPhoneDigits = cleanPhone.replace(/[^0-9]/g, '') || "14805550198";
       window.__DYNAMIC_PHONE_DISPLAY = cleanPhone;
       window.__DYNAMIC_PHONE_DIGITS = cleanPhoneDigits;
@@ -2599,6 +2654,9 @@
         window.__resizeThreeCanvas();
       }
     }
+
+    // Immediate parameter & theme engine initialization for instant brand & color application
+    initDynamicLandingPage();
 
     /* ─────────────────────────────────────────────────────────────
        ROUTING SYSTEM (URL HASH MULTI-VIEW)

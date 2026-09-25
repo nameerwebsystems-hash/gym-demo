@@ -1,30 +1,41 @@
 /**
  * KRONOS APEX - Dynamic Landing Page & Parameter Engine
  * Safely decodes URL parameters, sanitizes inputs, enforces strict fallbacks,
- * truncates business names (max 30 chars), and safely injects into DOM elements.
+ * truncates business names (max 25 chars with ...), and safely injects into DOM elements.
  */
 
 // Strict Fallback Constants
 const FALLBACK_BUSINESS = "KRONOS APEX";
 const FALLBACK_ADDRESS = "1126 S Gilbert Rd, Suite 104, Mesa, AZ 85204";
 const FALLBACK_LOCATION = "Mesa, AZ";
-const MAX_BUSINESS_LENGTH = 30;
+const FALLBACK_COLOR = "#FF1E27";
+const FALLBACK_PCOLOR = "#FF8C00";
+const FALLBACK_PHONE = "+1 (480) 555-0198";
+const FALLBACK_EMAIL = "concierge@kronosapex.com";
+const FALLBACK_SUB = "A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.";
+const FALLBACK_CTA = "EXPLORE MEMBERSHIPS";
+const MAX_BUSINESS_LENGTH = 25;
 
 /**
  * Safely decodes a URI component.
- * Replaces '+' with spaces and guards against URIError on malformed percent-encodings.
+ * Handles '+', '%20', and malformed percent-escapes gracefully with fallbacks.
  * @param {string|null} val 
  * @returns {string}
  */
 function safeDecodeParam(val) {
   if (typeof val !== 'string' || !val) return '';
+  const unplussed = val.replace(/\+/g, ' ');
   try {
-    return decodeURIComponent(val.replace(/\+/g, ' '));
+    return decodeURIComponent(unplussed);
   } catch (e) {
     try {
-      return decodeURI(val.replace(/\+/g, ' '));
+      return decodeURI(unplussed);
     } catch (e2) {
-      return val.replace(/\+/g, ' ');
+      try {
+        return decodeURIComponent(unplussed.replace(/%(?![0-9a-fA-F]{2})/g, '%25'));
+      } catch (e3) {
+        return unplussed;
+      }
     }
   }
 }
@@ -62,14 +73,39 @@ function escapeHTML(str) {
 }
 
 /**
- * Truncates business name to a strict maximum length (default: 30 chars).
+ * Truncates business name to a strict maximum length (default: 25 chars) and appends '...' if exceeded.
  * @param {string} name 
  * @param {number} maxLen 
  * @returns {string}
  */
 function truncateBusinessName(name, maxLen = MAX_BUSINESS_LENGTH) {
   if (!name || typeof name !== 'string') return '';
-  return name.length > maxLen ? name.slice(0, maxLen) : name;
+  const trimmed = name.trim();
+  if (trimmed.length > maxLen) {
+    return trimmed.slice(0, maxLen).trim() + '...';
+  }
+  return trimmed;
+}
+
+/**
+ * Normalizes and validates hex color strings.
+ * Handles '#HEX', 'HEX', '%23HEX', 3-digit '#RGB', and 6-digit '#RRGGBB'.
+ * @param {string|null} raw 
+ * @param {string|null} fallback 
+ * @returns {string|null}
+ */
+function normalizeHexColor(raw, fallback = null) {
+  if (!raw) return fallback;
+  let clean = sanitizeInput(safeDecodeParam(raw)).trim();
+  if (!clean) return fallback;
+  if (!clean.startsWith('#')) clean = '#' + clean;
+  if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(clean)) {
+    if (clean.length === 4) {
+      clean = '#' + clean[1] + clean[1] + clean[2] + clean[2] + clean[3] + clean[3];
+    }
+    return clean.toUpperCase();
+  }
+  return fallback;
 }
 
 /**
@@ -175,9 +211,9 @@ function getContrastColor(hex) {
 
 /**
  * Main URL Query Parameter Engine:
- * Reads ?business=...&address=... and other dynamic parameters,
- * decodes safely, sanitizes, enforces strict fallbacks, truncates business name (max 30 chars),
- * and safely updates the DOM and CSS variables.
+ * Reads ?business=...&color=...&pcolor=...&address=... etc.,
+ * decodes safely, sanitizes, enforces strict fallbacks, truncates business name (max 25 chars with ...),
+ * removes address from navbar/header area entirely, and safely updates the DOM and CSS variables.
  */
 function initDynamicLandingPage() {
   if (typeof window === 'undefined') return;
@@ -195,11 +231,12 @@ function initDynamicLandingPage() {
   const sanitizedBusiness = sanitizeInput(decodedBusiness);
 
   // Apply strict fallback if parameter is missing or empty
-  let businessName = sanitizedBusiness && sanitizedBusiness.length > 0 ? sanitizedBusiness : FALLBACK_BUSINESS;
+  const fullBusinessName = sanitizedBusiness && sanitizedBusiness.length > 0 ? sanitizedBusiness : FALLBACK_BUSINESS;
 
-  // Truncate excessively long business names (max 30 characters)
-  businessName = truncateBusinessName(businessName, MAX_BUSINESS_LENGTH);
+  // Truncate excessively long business names (max 25 characters with ... if exceeded)
+  const businessName = truncateBusinessName(fullBusinessName, MAX_BUSINESS_LENGTH);
   window.__DYNAMIC_BRAND_NAME = businessName;
+  window.__FULL_BRAND_NAME = fullBusinessName;
 
   // Header Sub-brand split (e.g. before dashes or colons if applicable)
   let headerBrandName = businessName;
@@ -221,15 +258,15 @@ function initDynamicLandingPage() {
   const navFirst = navParts[0] || headerBrandName;
   const navRest = navParts.slice(1).join(' ');
 
-  // Inject into DOM element: #business-title
+  // Inject clean business title into navbar: #business-title (Max 25 chars, no address)
   const busTitleEl = document.getElementById('business-title');
   if (busTitleEl) {
     if (navRest) {
-      busTitleEl.innerHTML = `${escapeHTML(navFirst)} <span class="text-crimson-500 font-light brand-accent-span">${escapeHTML(navRest)}</span>`;
+      busTitleEl.innerHTML = `${escapeHTML(navFirst)} <span class="font-light brand-accent-span" style="color:var(--primary);">${escapeHTML(navRest)}</span>`;
     } else {
-      busTitleEl.textContent = businessName;
+      busTitleEl.textContent = headerBrandName;
     }
-    busTitleEl.setAttribute('title', businessName);
+    busTitleEl.setAttribute('title', fullBusinessName);
   }
 
   // Update all other .brand-title elements (excluding #business-title to prevent DOM disruption)
@@ -255,31 +292,22 @@ function initDynamicLandingPage() {
   document.querySelectorAll('.brand-title-split').forEach(el => {
     if (el === busTitleEl || el.contains(busTitleEl)) return;
     if (navRest) {
-      el.innerHTML = `${escapeHTML(navFirst)} <span class="text-crimson-500 font-light brand-accent-span">${escapeHTML(navRest)}</span>`;
+      el.innerHTML = `${escapeHTML(navFirst)} <span class="font-light brand-accent-span" style="color:var(--primary);">${escapeHTML(navRest)}</span>`;
     } else {
       el.textContent = headerBrandName;
     }
   });
 
-  // 2. Primary Theme Color (?color=)
-  const rawColor = params.get('color');
-  const decodedColor = safeDecodeParam(rawColor);
-  const sanitizedColor = sanitizeInput(decodedColor);
-  const hexColor = sanitizedColor
-    ? (sanitizedColor.startsWith('#') ? sanitizedColor : `#${sanitizedColor}`).toUpperCase()
-    : "#FF1E27";
-
+  // 2. Primary Theme Color (?color= or ?primary=)
+  const rawColor = params.get('color') || params.get('primary') || params.get('primaryColor') || params.get('themeColor');
+  const hexColor = normalizeHexColor(rawColor, FALLBACK_COLOR);
   const rgb = hexToRgb(hexColor) || { r: 255, g: 30, b: 39 };
   const contrastText = getContrastColor(hexColor);
 
-  // 3. Secondary / Particle Color (?particleColor= or ?pcolor=)
-  const rawPColor = params.get('particleColor') || params.get('pcolor');
-  const decodedPColor = safeDecodeParam(rawPColor);
-  const sanitizedPColor = sanitizeInput(decodedPColor);
-  let hexPColor;
-  if (sanitizedPColor) {
-    hexPColor = (sanitizedPColor.startsWith('#') ? sanitizedPColor : `#${sanitizedPColor}`).toUpperCase();
-  } else {
+  // 3. Secondary / Particle Color (?pcolor= or ?particleColor=)
+  const rawPColor = params.get('pcolor') || params.get('particleColor') || params.get('secondaryColor') || params.get('secondary');
+  let hexPColor = normalizeHexColor(rawPColor, null);
+  if (!hexPColor) {
     hexPColor = getComplementarySecondaryColor(hexColor);
   }
 
@@ -314,6 +342,7 @@ function initDynamicLandingPage() {
   }
 
   // 4. Dynamic Address & Location (?address= or ?loc= / ?location= or ?city=)
+  // FULL address only appears in Sanctuary Headquarters / contact section, NEVER in the top header.
   const rawAddress = params.get('address') || params.get('loc');
   const decodedAddress = safeDecodeParam(rawAddress);
   const sanitizedAddress = sanitizeInput(decodedAddress);
@@ -342,21 +371,22 @@ function initDynamicLandingPage() {
     fullAddress = `100 Athletic Way, Suite 100, ${shortLocation}`;
   }
 
-  // Inject into DOM element: #business-address
+  // Inject into Sanctuary Headquarters / contact section ONLY
+  const contactAddrEl = document.getElementById('contact-address-text');
+  if (contactAddrEl) {
+    contactAddrEl.textContent = fullAddress;
+  }
   const busAddressEl = document.getElementById('business-address');
   if (busAddressEl) {
     busAddressEl.textContent = fullAddress;
     busAddressEl.setAttribute('title', fullAddress);
   }
-
-  // Also update #header-location if present
-  const headerLocEl = document.getElementById('header-location');
-  if (headerLocEl) {
-    headerLocEl.textContent = shortLocation;
-    headerLocEl.setAttribute('title', fullAddress);
+  const mapsLink = document.getElementById('contact-maps-link');
+  if (mapsLink) {
+    mapsLink.href = `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`;
   }
 
-  // Update brand location and city labels
+  // Update brand location and city labels in body/footer
   document.querySelectorAll('.brand-location:not(#business-address), .city-name').forEach(el => {
     el.textContent = shortLocation;
   });
@@ -364,20 +394,11 @@ function initDynamicLandingPage() {
     el.innerHTML = `The #1 Gym in <span class="city-name font-bold text-white">${escapeHTML(shortLocation)}</span>`;
   });
 
-  const contactAddrEl = document.getElementById('contact-address-text');
-  if (contactAddrEl) {
-    contactAddrEl.textContent = fullAddress;
-  }
-  const mapsLink = document.getElementById('contact-maps-link');
-  if (mapsLink) {
-    mapsLink.href = `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`;
-  }
-
   // 5. Dynamic Phone (?phone=)
   const rawPhone = params.get('phone');
   const decodedPhone = safeDecodeParam(rawPhone);
   const sanitizedPhone = sanitizeInput(decodedPhone);
-  const cleanPhone = sanitizedPhone || "+1 (480) 555-0198";
+  const cleanPhone = sanitizedPhone || FALLBACK_PHONE;
   const cleanPhoneDigits = cleanPhone.replace(/[^0-9]/g, '') || "14805550198";
 
   window.__DYNAMIC_PHONE_DISPLAY = cleanPhone;
@@ -399,7 +420,7 @@ function initDynamicLandingPage() {
   const rawEmail = params.get('email');
   const decodedEmail = safeDecodeParam(rawEmail);
   const sanitizedEmail = sanitizeInput(decodedEmail);
-  const cleanEmail = sanitizedEmail || "concierge@kronosapex.com";
+  const cleanEmail = sanitizedEmail || FALLBACK_EMAIL;
   window.__DYNAMIC_EMAIL = cleanEmail;
 
   const emailLink = document.getElementById('contact-email-link');
@@ -411,7 +432,7 @@ function initDynamicLandingPage() {
   const rawSub = params.get('sub');
   const decodedSub = safeDecodeParam(rawSub);
   const sanitizedSub = sanitizeInput(decodedSub);
-  const cleanSub = sanitizedSub || "A sanctuary where uncompromising biomechanics, calibrated competition iron, and infrared recovery collide to sculpt the elite human form.";
+  const cleanSub = sanitizedSub || FALLBACK_SUB;
 
   document.querySelectorAll('.hero-subtitle, #hero-subtitle').forEach(el => {
     el.textContent = cleanSub;
@@ -421,7 +442,7 @@ function initDynamicLandingPage() {
   const rawCta = params.get('cta');
   const decodedCta = safeDecodeParam(rawCta);
   const sanitizedCta = sanitizeInput(decodedCta);
-  const cleanCta = sanitizedCta || "EXPLORE MEMBERSHIPS";
+  const cleanCta = sanitizedCta || FALLBACK_CTA;
 
   document.querySelectorAll('.main-cta-btn .cta-text, #hero-cta-btn .cta-text').forEach(el => {
     el.textContent = cleanCta;
@@ -438,7 +459,7 @@ function initDynamicLandingPage() {
     ambientVignette.style.background = `radial-gradient(circle at 50% 0%, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.08) 0%, transparent 65%)`;
   }
 
-  // 11. Dynamic theme CSS style tag injection
+  // 11. Dynamic theme CSS style tag injection across buttons, badges, highlights, and borders
   let styleOverride = document.getElementById('dynamic-theme-override');
   if (!styleOverride) {
     styleOverride = document.createElement('style');
@@ -460,6 +481,110 @@ function initDynamicLandingPage() {
       --secondary-rgb: ${secRgb.r}, ${secRgb.g}, ${secRgb.b};
       --sec-contrast-text: ${secContrastText};
     }
+
+    /* 1. Primary Buttons & CTAs */
+    #hero-cta-btn, .main-cta-btn, #contact-submit-btn, #cart-checkout-btn,
+    [onclick*="openMembershipModal"].bg-crimson-600,
+    [onclick*="openMembershipModal"].bg-gradient-to-r,
+    #membership-modal button[type="submit"],
+    #contact-form button[type="submit"] {
+      background: var(--primary) !important;
+      background-color: var(--primary) !important;
+      color: var(--contrast-text) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+      text-shadow: none !important;
+    }
+    #hero-cta-btn *, .main-cta-btn *, #contact-submit-btn *, #cart-checkout-btn *,
+    [onclick*="openMembershipModal"].bg-crimson-600 *,
+    [onclick*="openMembershipModal"].bg-gradient-to-r *,
+    #membership-modal button[type="submit"] *,
+    #contact-form button[type="submit"] * {
+      color: var(--contrast-text) !important;
+    }
+    #hero-cta-btn:hover, .main-cta-btn:hover, #contact-submit-btn:hover, #cart-checkout-btn:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    /* 2. Badges */
+    #cart-counter-badge, #mobile-cart-badge, .popular-tier-badge, .product-badge {
+      background-color: var(--primary) !important;
+      color: var(--contrast-text) !important;
+    }
+
+    /* 3. Highlights & Typography */
+    .highlight, #hero-brand-highlight, .brand-accent-span, .text-primary-accent {
+      color: var(--primary) !important;
+      -webkit-text-fill-color: var(--primary) !important;
+      text-shadow: none !important;
+      filter: none !important;
+    }
+    .text-crimson-400, .text-crimson-500, .text-crimson-600 {
+      color: var(--primary) !important;
+    }
+
+    /* 4. Active Navigation and Filter Buttons */
+    .nav-link.bg-crimson-600, .gallery-filter-btn.active, .shop-filter-btn.active, .gender-btn.active,
+    #billing-monthly-btn.bg-crimson-600, #billing-annual-btn.bg-crimson-600 {
+      background: var(--primary) !important;
+      background-color: var(--primary) !important;
+      color: var(--contrast-text) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+    }
+    .nav-link.bg-crimson-600 *, .gallery-filter-btn.active *, .shop-filter-btn.active *, .gender-btn.active *,
+    #billing-monthly-btn.bg-crimson-600 *, #billing-annual-btn.bg-crimson-600 * {
+      color: var(--contrast-text) !important;
+    }
+
+    /* 5. Borders */
+    .border-crimson-500, .border-crimson-600, .border-crimson-800, [class*="border-crimson"] {
+      border-color: var(--primary) !important;
+    }
+    .hover\\:border-crimson-500:hover {
+      border-color: var(--primary) !important;
+    }
+    .focus\\:border-crimson-500:focus {
+      border-color: var(--primary) !important;
+    }
+    .focus\\:ring-crimson-500:focus {
+      --tw-ring-color: var(--primary) !important;
+    }
+    #toast {
+      border-color: rgba(var(--primary-rgb), 0.4) !important;
+    }
+    #toast-icon {
+      background-color: var(--primary) !important;
+      color: var(--contrast-text) !important;
+    }
+    input[type=range] {
+      accent-color: var(--primary) !important;
+    }
+    ::selection {
+      background-color: var(--primary) !important;
+      color: var(--contrast-text) !important;
+    }
+
+    /* 6. Secondary Accent Styling */
+    #hero-status-badge {
+      border: 1px solid var(--secondary) !important;
+      color: var(--secondary) !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+    }
+    .stat-unit {
+      color: var(--secondary) !important;
+    }
+    #cyber-grid {
+      background-size: 55px 55px;
+      background-image: 
+        linear-gradient(to right, rgba(${secRgb.r}, ${secRgb.g}, ${secRgb.b}, 0.10) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(${secRgb.r}, ${secRgb.g}, ${secRgb.b}, 0.10) 1px, transparent 1px);
+      mask-image: radial-gradient(circle at 50% 35%, black 40%, transparent 85%);
+      -webkit-mask-image: radial-gradient(circle at 50% 35%, black 40%, transparent 85%);
+    }
+    .secondary-ghost-btn:hover {
+      border-color: var(--primary) !important;
+    }
   `;
 
   // 12. Ensure Three.js Canvas scales correctly with updated layout
@@ -474,11 +599,18 @@ if (typeof module !== 'undefined' && module.exports) {
     FALLBACK_BUSINESS,
     FALLBACK_ADDRESS,
     FALLBACK_LOCATION,
+    FALLBACK_COLOR,
+    FALLBACK_PCOLOR,
+    FALLBACK_PHONE,
+    FALLBACK_EMAIL,
+    FALLBACK_SUB,
+    FALLBACK_CTA,
     MAX_BUSINESS_LENGTH,
     safeDecodeParam,
     sanitizeInput,
     escapeHTML,
     truncateBusinessName,
+    normalizeHexColor,
     hexToRgb,
     hslToHex,
     getComplementarySecondaryColor,
@@ -493,5 +625,6 @@ if (typeof window !== 'undefined') {
   window.sanitizeInput = sanitizeInput;
   window.escapeHTML = escapeHTML;
   window.truncateBusinessName = truncateBusinessName;
+  window.normalizeHexColor = normalizeHexColor;
   window.initDynamicLandingPage = initDynamicLandingPage;
 }
